@@ -340,7 +340,6 @@ public class QAController {
     // --------------------------------------------------
     // 2. DRYING RECORDS QA CONTROLS
     // --------------------------------------------------
-
     @GetMapping("/qa-drying-records")
     public String viewDryingRecords(
             @RequestParam(required = false) String startDate,
@@ -348,25 +347,31 @@ public class QAController {
             HttpSession session, Model model){
 
         if(!"QA".equals(session.getAttribute("role"))) return "redirect:/login";
-        // Only records with explicit DRYING status (avoid showing all batches)
-        // ✅ FIX #2: ONLY show PENDING and DRYING records in QA drying tab
-// APPROVED records should NOT appear here - they've already passed QA
-        // ✅ FIX #5: Show PENDING, DRYING, and APPROVED batches in QA drying tab
-// APPROVED batches show with a badge for reference but cannot be re-approved
+
+        // ✅ FIX #5: Show PENDING, DRYING, APPROVED, and CONSOLIDATED batches in QA drying tab
+        // APPROVED batches show with a badge for reference but cannot be re-approved
         List<ProductionBatch> dryingRecords = productionRepo.findAll().stream()
                 .filter(b -> "DRYING".equals(b.getStatus()) || "PENDING".equals(b.getStatus()) || "APPROVED".equals(b.getStatus()) || "CONSOLIDATED".equals(b.getStatus()))
                 .collect(Collectors.toList());
-        // Apply Date Range Filter Safely
+
+        // ✅ FIX: Apply Date Range Filter by dryingDate (with fallback to productionDate)
+        // This allows drying data from different dates to show up in QA
         if (startDate != null && !startDate.isEmpty()) {
             LocalDate start = LocalDate.parse(startDate);
             dryingRecords = dryingRecords.stream()
-                    .filter(r -> r.getProductionDate() != null && !r.getProductionDate().isBefore(start))
+                    .filter(r -> {
+                        LocalDate dateToCheck = r.getDryingDate() != null ? r.getDryingDate() : r.getProductionDate();
+                        return dateToCheck != null && !dateToCheck.isBefore(start);
+                    })
                     .collect(Collectors.toList());
         }
         if (endDate != null && !endDate.isEmpty()) {
             LocalDate end = LocalDate.parse(endDate);
             dryingRecords = dryingRecords.stream()
-                    .filter(r -> r.getProductionDate() != null && !r.getProductionDate().isAfter(end))
+                    .filter(r -> {
+                        LocalDate dateToCheck = r.getDryingDate() != null ? r.getDryingDate() : r.getProductionDate();
+                        return dateToCheck != null && !dateToCheck.isAfter(end);
+                    })
                     .collect(Collectors.toList());
         }
 
@@ -375,8 +380,13 @@ public class QAController {
         model.addAttribute("dryingRecords", dryingRecords);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
+        System.out.println("DEBUG: Found " + dryingRecords.size() + " drying records");
+        for (ProductionBatch b : dryingRecords) {
+            System.out.println("  - " + b.getLotNumber() + " | Status: " + b.getStatus() + " | DryingDate: " + b.getDryingDate());
+        }
         return "qa_drying_records";
     }
+
 
     // Asynchronous API endpoint for QA Updates with server-side validation
     @PostMapping("/api/qa/drying/update-status")

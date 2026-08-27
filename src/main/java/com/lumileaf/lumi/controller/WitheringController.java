@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import com.lumileaf.lumi.model.NotificationEvent;
 import com.lumileaf.lumi.repository.NotificationEventRepository;
+import com.lumileaf.lumi.util.BatchIdUtils;
 
 @Controller
 public class WitheringController {
@@ -213,10 +214,8 @@ public class WitheringController {
             record.setStartTime(allParams.get("startTime"));
             record.setEndTime(allParams.get("endTime"));
 
-            // ── TRACKING SYSTEM SEED INJECTION ──
-            // Now using the pre-validated, trimmed values instead of raw allParams.get(...)
-            record.setProductionBatchNo(productionBatchNo.trim());
-            record.setProductionLotNo(productionLotNo.trim());
+            record.setProductionBatchNo(BatchIdUtils.normalizeLotNumber(productionBatchNo));
+            record.setProductionLotNo(BatchIdUtils.normalizeLotNumber(productionLotNo));
 
             if (record.getStartTime() != null && record.getEndTime() != null) {
                 record.setTimeTaken(calculateDuration(record.getStartTime(), record.getEndTime()));

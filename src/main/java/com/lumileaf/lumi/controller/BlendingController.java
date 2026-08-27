@@ -24,14 +24,21 @@ import jakarta.servlet.http.HttpSession;
 import com.lumileaf.lumi.service.ContributionService;
 import org.springframework.http.ResponseEntity;
 import com.lumileaf.lumi.model.FarmerContribution;
+import org.springframework.beans.factory.annotation.Value;
+import com.lumileaf.lumi.model.Buyer;
+import com.lumileaf.lumi.repository.BuyerRepository;
+
 
 @Controller
 public class BlendingController {
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     @Autowired private BlendingRepository blendingRepo;
     @Autowired private ProductionBatchRepository productionRepo;
     @Autowired private BlendBalanceRepository blendBalanceRepo;
     @Autowired private ContributionService contributionService;
+    @Autowired private BuyerRepository buyerRepo;
     private Map<String, List<Blending>> buildGroupedBlends() {
         return blendingRepo.findAll().stream()
                 .collect(Collectors.groupingBy(Blending::getInvoiceNumber));
@@ -55,6 +62,7 @@ public class BlendingController {
 
         model.addAttribute("groupedBlends", groupedBlends);
         model.addAttribute("newBlend", new Blending());
+        model.addAttribute("buyers", buyerRepo.findAll());
 
         return "blending";
     }
@@ -152,6 +160,7 @@ public class BlendingController {
         model.addAttribute("groupedBlends", groupedBlends);
         model.addAttribute("newBlend", newLine);
         model.addAttribute("lockInvoice", true);
+        model.addAttribute("buyers", buyerRepo.findAll());   // ADD THIS LINE
         return "blending";
     }
 
@@ -413,7 +422,17 @@ public class BlendingController {
 
         model.addAttribute("groupedBlends", groupedBlends);
         model.addAttribute("newBlend", blendToEdit);
+        model.addAttribute("buyers", buyerRepo.findAll());
         return "blending";
+    }
+    @PostMapping("/blending/buyers/add")
+    public String addBuyer(@RequestParam String name, RedirectAttributes ra) {
+        if (name != null && !name.trim().isEmpty()) {
+            Buyer buyer = new Buyer();
+            buyer.setName(name.trim());
+            buyerRepo.save(buyer);
+        }
+        return "redirect:/blending";
     }
     @GetMapping("/blending/dispatch-note/{id}")
     public String showDispatchNote(@PathVariable Long id, Model model) {
@@ -431,10 +450,7 @@ public class BlendingController {
             defaultPackages.add(remaining);
         }
 
-        String ipAddress;
-        try { ipAddress = InetAddress.getLocalHost().getHostAddress(); }
-        catch (UnknownHostException e) { ipAddress = "localhost"; }
-        String traceUrl = "http://" + ipAddress + ":8080/trace/" + blend.getFinishedGoodNumber();
+        String traceUrl = baseUrl + "/trace/" + blend.getFinishedGoodNumber();
         String qrCode = QRGenerator.generateQRBase64(traceUrl, 300, 300);
 
         model.addAttribute("blend", blend);
@@ -451,7 +467,7 @@ public class BlendingController {
         try { ipAddress = InetAddress.getLocalHost().getHostAddress(); }
         catch (UnknownHostException e) { ipAddress = "localhost"; }
 
-        String traceUrl = "http://" + ipAddress + ":8080/trace/" + blend.getFinishedGoodNumber();
+        String traceUrl = baseUrl + "/trace/" + blend.getFinishedGoodNumber();
         String qrBase64 = QRGenerator.generateQRBase64(traceUrl, 300, 300);
 
         model.addAttribute("blend", blend);

@@ -30,6 +30,10 @@ public class ProductionBatch {
     @Column(name = "production_date")
     private LocalDate productionDate;
 
+    // ✅ NEW: Track when drying actually occurs (separate from green leaf arrival date)
+    @Column(name = "drying_date")
+    private LocalDate dryingDate;
+
     @Column(name = "lot_number")
     private String lotNumber;
 
@@ -159,6 +163,10 @@ public class ProductionBatch {
 
     public LocalDate getProductionDate() { return productionDate; }
     public void setProductionDate(LocalDate productionDate) { this.productionDate = productionDate; }
+
+    // ✅ NEW: Drying date getters/setters
+    public LocalDate getDryingDate() { return dryingDate; }
+    public void setDryingDate(LocalDate dryingDate) { this.dryingDate = dryingDate; }
 
     // NEW: Convenience accessor required by templates: greenLeafArrivedDate
     // Returns productionDate when available, otherwise falls back to transactionDate.

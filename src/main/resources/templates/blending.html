@@ -52,6 +52,32 @@
             <button class="btn btn-success rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#blendModal" onclick="clearBlendContext()">
                 <i class="fas fa-plus me-2"></i> Add New Blend
             </button>
+            <button class="btn btn-outline-success rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#buyerModal">
+                <i class="fas fa-users me-2"></i> Manage Buyers
+            </button>
+        </div>
+    </div>
+    <div class="modal fade" id="buyerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+                <div class="modal-header border-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold text-success"><i class="fas fa-users me-2"></i>Manage Buyers</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body px-4">
+                    <form th:action="@{/blending/buyers/add}" method="post" class="d-flex gap-2 mb-3">
+                        <input type="text" name="name" class="form-control rounded-3 border-0 shadow-sm" placeholder="e.g. A.B.C Perera" required>
+                        <button type="submit" class="btn btn-success rounded-pill px-3">Add</button>
+                    </form>
+                    <ul class="list-group">
+                        <li class="list-group-item" th:each="b : ${buyers}" th:text="${b.name}"></li>
+                    </ul>
+                    <div th:if="${buyers == null or buyers.isEmpty()}" class="text-muted small">No buyers added yet.</div>
+                </div>
+                <div class="modal-footer border-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light px-4 rounded-pill" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -189,10 +215,10 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Buyer Information</label>
-                            <input type="text" th:field="*{buyerInfo}" id="buyerInfo" class="form-control rounded-3 border-0 shadow-sm"
-                                   placeholder="e.g. A.B.C Perera" required
-                                   pattern="^(?!\.)(?!.*\.\.)[A-Za-z\s.]+$" title="Only letters, spaces, and dots are allowed."
-                                   oninput="this.value = this.value.replace(/[^A-Za-z\s.]/g, '').replace(/\.{2,}/g, '.').replace(/^\./, '');">
+                            <select th:field="*{buyerInfo}" id="buyerInfo" class="form-select rounded-3 border-0 shadow-sm" required>
+                                <option value="" disabled selected>Select a buyer...</option>
+                                <option th:each="b : ${buyers}" th:value="${b.name}" th:text="${b.name}"></option>
+                            </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-bold">Grade</label>

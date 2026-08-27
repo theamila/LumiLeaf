@@ -17,4 +17,9 @@ public final class BatchIdUtils {
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.toList());
     }
+
+    public static String normalizeLotNumber(String raw) {
+        if (raw == null) return null;
+        return raw.trim().replaceAll("\\s+", " ").toUpperCase();
+    }
 }

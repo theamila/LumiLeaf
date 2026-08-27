@@ -32,6 +32,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import com.lumileaf.qrcode.QRGenerator;
+import org.springframework.beans.factory.annotation.Value;
 
 
 @Controller
@@ -45,6 +46,8 @@ public class ProductionController {
     @Autowired private BlendBalanceRepository blendBalanceRepo;
     @Autowired private StockProductionRepository stockProductionRepo;
     @Autowired private ContributionService contributionService;
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     @Autowired private TemplateEngine templateEngine;
 
@@ -310,6 +313,10 @@ public class ProductionController {
                 batchToSave.setStatus("PENDING");
             }
         }
+        // ✅ NEW: If status is changing to DRYING, set the drying date
+        if ("DRYING".equalsIgnoreCase(batch.getStatus()) && batchToSave.getDryingDate() == null) {
+            batchToSave.setDryingDate(LocalDate.now());
+        }
 
         productionRepo.save(batchToSave);
         // FIX (Issue 3 / Option A): once a batch is CONSOLIDATED into Stock Production,
@@ -570,15 +577,7 @@ public class ProductionController {
             return "redirect:/blending?error=Invoice Not Found";
         }
 
-        // Generate the traceability QR for this invoice — points to this same page's URL,
-        // same host-resolution pattern already used in BlendingController.showQrLabel().
-        String ipAddress;
-        try {
-            ipAddress = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            ipAddress = "localhost";
-        }
-        String traceUrl = "http://" + ipAddress + ":8080/trace/invoice/" + invoiceNumber;
+        String traceUrl = baseUrl + "/trace/invoice/" + invoiceNumber;
         String qrCode = QRGenerator.generateQRBase64(traceUrl, 400, 400);
         model.addAttribute("qrCode", qrCode);
 
@@ -998,6 +997,10 @@ public class ProductionController {
         }
 
         batchToSave.setStatus("DRYING");
+        // ✅ NEW: Set drying date to today when drying record is created/updated
+        if (batchToSave.getDryingDate() == null) {
+            batchToSave.setDryingDate(LocalDate.now());
+        }
 
         productionRepo.save(batchToSave);
         return "redirect:/mobile/drying_dashboard?success";

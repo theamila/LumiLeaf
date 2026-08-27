@@ -102,9 +102,7 @@ public class RollingController {
                     String lotNumber = r.getLotNumber() != null ? r.getLotNumber().trim() : null;
                     ProductionBatch pb = null;
                     if (lotNumber != null && !lotNumber.isEmpty()) {
-                        pb = productionRepo
-                                .findTopByLotNumberOrderByRollingDateDesc(lotNumber)
-                                .orElse(null);
+                        pb = productionRepo.findTopByLotNumberAndRollingDateOrderByIdDesc(lotNumber, selectedDate).orElse(null);
                     }
                     if (pb == null) return true;
                     return !"APPROVED".equals(pb.getStatus()) && !"CONSOLIDATED".equals(pb.getStatus());

@@ -2,74 +2,426 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Withering Analytics | LumiLeaf QA</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --leaf-green: #2e7d32; --industrial-gray: #455a64; --soft-bg: #f1f8e9; }
-        body { background: var(--soft-bg); padding: 30px; font-family: 'Inter', sans-serif; color: var(--industrial-gray); }
-        .table-container { background: white; padding: 0; border-radius: 15px; overflow: hidden; border: 1px solid #cfd8dc; }
-        .badge-batch { background: var(--industrial-gray); color: white; padding: 6px 12px; border-radius: 6px; font-weight: 700; font-family: 'Courier New', monospace; }
-        .time-label { font-size: 0.8rem; color: #78909c; font-weight: 600; }
-        .duration-badge { background: #e3f2fd; color: #1565c0; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; border: 1px solid #bbdefb; }
-        .duration-alert { background: #fff3e0; color: #ef6c00; border-color: #ffe0b2; }
-        .loss-container { padding: 6px 12px; border-radius: 8px; font-weight: 800; display: inline-block; }
-        .loss-normal { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
-        .loss-warning { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
-        .labor-text { font-size: 0.9rem; color: #546e7a; font-style: italic; }
-        .search-bar { border-radius: 12px; border: 1px solid #cfd8dc; padding: 12px 20px; }
+        :root {
+            --leaf-green: #2e7d32;
+            --leaf-light: #4caf50;
+            --industrial-gray: #455a64;
+            --soft-bg: #f5f7fa;
+            --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: linear-gradient(135deg, var(--soft-bg) 0%, #ffffff 100%);
+            padding: 30px 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--industrial-gray);
+            min-height: 100vh;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--leaf-green) 0%, var(--leaf-light) 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .header-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .header-section p {
+            font-size: 1rem;
+            opacity: 0.95;
+            margin: 0;
+        }
+
+        .controls-section {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .search-wrapper {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-bar {
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            padding: 14px 20px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .search-bar:focus {
+            border-color: var(--leaf-green);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+            outline: none;
+        }
+
+        .input-group-text {
+            background: white !important;
+            border: 2px solid #e0e0e0 !important;
+            border-right: none !important;
+            color: #90a4ae;
+        }
+
+        .search-bar {
+            border-left: none !important;
+            border: 2px solid #e0e0e0 !important;
+        }
+
+        .search-bar:focus ~ .input-group-text,
+        .input-group:has(.search-bar:focus) .input-group-text {
+            border-color: var(--leaf-green) !important;
+        }
+
+        .back-btn {
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            border: 2px solid var(--leaf-green);
+            color: var(--leaf-green);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            background: var(--leaf-green);
+            color: white;
+            transform: translateX(-4px);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            border: 1px solid #eceff1;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .table-container:hover {
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .table {
+            margin: 0;
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, #f5f7fa 0%, #eeeeee 100%);
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .table thead th {
+            font-weight: 700;
+            color: var(--industrial-gray);
+            padding: 20px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background: #fafafa;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .table tbody td {
+            padding: 18px 20px;
+            vertical-align: middle;
+        }
+
+        .badge-batch {
+            background: linear-gradient(135deg, var(--industrial-gray) 0%, #546e7a 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            display: inline-block;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .batch-date {
+            color: #78909c;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        .time-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: var(--industrial-gray);
+        }
+
+        .time-display i {
+            color: var(--leaf-green);
+            font-size: 1.1rem;
+        }
+
+        .duration-badge {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: #1565c0;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 1.5px solid #90caf9;
+            display: inline-block;
+            box-shadow: 0 2px 6px rgba(21, 101, 192, 0.15);
+        }
+
+        .duration-alert {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            color: #e65100;
+            border-color: #ffb74d;
+            box-shadow: 0 2px 6px rgba(230, 81, 0, 0.15);
+        }
+
+        .weight-display {
+            background: #fafafa;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border-left: 4px solid var(--leaf-green);
+        }
+
+        .weight-display .label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .weight-display .value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--industrial-gray);
+        }
+
+        .weight-display .in {
+            color: var(--leaf-green);
+            border-left-color: var(--leaf-green);
+        }
+
+        .weight-display .out {
+            color: #d32f2f;
+            border-left-color: #d32f2f;
+            margin-top: 8px;
+        }
+
+        .loss-container {
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 800;
+            display: inline-block;
+            font-size: 0.9rem;
+            text-align: center;
+            min-width: 70px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .loss-normal {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            color: #1b5e20;
+            border: 1.5px solid #81c784;
+        }
+
+        .loss-warning {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            color: #b71c1c;
+            border: 1.5px solid #ef5350;
+        }
+
+        .labor-team {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--industrial-gray);
+            font-weight: 500;
+        }
+
+        .labor-team i {
+            color: var(--leaf-green);
+            font-size: 1rem;
+        }
+
+        .officer-name {
+            font-weight: 700;
+            color: var(--industrial-gray);
+            font-size: 0.95rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #90a4ae;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #cfd8dc;
+            margin-bottom: 20px;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-section {
+                padding: 30px 20px;
+            }
+
+            .header-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .controls-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-wrapper {
+                width: 100%;
+                min-width: auto;
+            }
+
+            .back-btn {
+                width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .table thead th,
+            .table tbody td {
+                padding: 12px 10px;
+                font-size: 0.85rem;
+            }
+
+            .badge-batch {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+        }
+
+        /* Loading Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .table tbody tr {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* No Results Message */
+        .no-results-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #90a4ae;
+        }
+
+        .no-results-message.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold mb-1"><i class="fas fa-microscope me-2 text-success"></i> Withering Quality Analysis</h2>
-            <p class="text-muted small">Reviewing 12-18h cycle efficiency and labor performance</p>
+<div class="container-fluid" style="max-width: 1400px;">
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h2><i class="fas fa-leaf me-3"></i>Withering Quality Analysis</h2>
+                <p>Reviewing 12-18h cycle efficiency and labor performance</p>
+            </div>
+            <a th:href="@{/qa_dashboard}" class="btn back-btn">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
         </div>
-        <a th:href="@{/qa_dashboard}" class="btn btn-outline-secondary px-4 rounded-pill">
-            <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
-        </a>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-md-5">
+    <!-- Controls Section -->
+    <div class="controls-section">
+        <div class="search-wrapper">
             <div class="input-group shadow-sm">
-                <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                <input type="text" id="witheringSearch" class="form-control border-start-0 search-bar"
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" id="witheringSearch" class="form-control search-bar"
                        placeholder="Search Batch ID, Labors, or Officers..." onkeyup="filterWitheringTable()">
             </div>
         </div>
     </div>
 
+    <!-- Table Container -->
     <div class="table-container shadow-sm">
         <table class="table table-hover align-middle mb-0" id="witheringTable">
-            <thead class="table-light">
-            <tr style="height: 60px;">
-                <th class="ps-4">Batch Details</th>
+            <thead>
+            <tr>
+                <th>Batch Details</th>
                 <th>Time (Start - End)</th>
                 <th>Duration</th>
                 <th>Weights (Fresh/Withered)</th>
                 <th>Moisture Loss</th>
                 <th>Labor Team</th>
                 <th class="text-center">Recorded By</th>
-                <th class="text-center">Actions</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="record : ${witheringRecords}">
-                <td class="ps-4">
-                    <span class="badge-batch mb-1" th:text="${record.batchId ?: 'UNKNOWN'}">WTH/10/2</span>
-                    <div class="text-muted small" th:text="${record.date ?: 'No Date'}">2026-03-09</div>
-                </td>
+                <!-- Batch Details -->
                 <td>
-                    <div class="d-flex align-items-center fw-bold">
-                        <i class="far fa-clock me-2 text-muted"></i>
-                        <span th:text="${record.startTime != null ? record.startTime : '--:--'}"></span>
-                        <span class="mx-1 text-muted">-</span>
-                        <span th:text="${record.endTime != null ? record.endTime : '--:--'}"></span>
+                    <div>
+                        <span class="badge-batch" th:text="${record.batchId ?: 'UNKNOWN'}">WTH/10/2</span>
+                        <div class="batch-date" th:text="${record.date ?: 'No Date'}">2026-03-09</div>
                     </div>
                 </td>
+
+                <!-- Time Display -->
+                <td>
+                    <div class="time-display">
+                        <i class="far fa-clock"></i>
+                        <span th:text="${record.startTime != null ? record.startTime : '--:--'}">12:35</span>
+                        <span class="text-muted">-</span>
+                        <span th:text="${record.endTime != null ? record.endTime : '--:--'}">09:35</span>
+                    </div>
+                </td>
+
+                <!-- Duration -->
                 <td>
                     <span th:with="rawTime=${record.timeTaken ?: '0h'},
                                    hasH=${#strings.contains(rawTime, 'h')},
@@ -79,40 +431,51 @@
                         16h 00m
                     </span>
                 </td>
+
+                <!-- Weights -->
                 <td>
-                    <div class="small">
-                        <span class="text-success fw-bold">In: </span>
-                        <span th:text="${record.intakeWeight != null ? record.intakeWeight + ' kg' : '0.0 kg'}">500kg</span><br>
-                        <span class="text-danger fw-bold">Out: </span>
-                        <span th:text="${record.witheredWeight != null ? record.witheredWeight + ' kg' : '0.0 kg'}">280kg</span>
+                    <div class="weight-display in">
+                        <div class="label"><i class="fas fa-arrow-down me-1" style="color: var(--leaf-green);"></i>Input</div>
+                        <div class="value" th:text="${record.intakeWeight != null ? record.intakeWeight + ' kg' : '0.0 kg'}">500 kg</div>
+                    </div>
+                    <div class="weight-display out">
+                        <div class="label"><i class="fas fa-arrow-up me-1" style="color: #d32f2f;"></i>Output</div>
+                        <div class="value" th:text="${record.witheredWeight != null ? record.witheredWeight + ' kg' : '0.0 kg'}">280 kg</div>
                     </div>
                 </td>
+
+                <!-- Moisture Loss -->
                 <td>
                     <div th:with="before=${record.intakeWeight != null ? record.intakeWeight : 0.0},
                                    after=${record.witheredWeight != null ? record.witheredWeight : 0.0},
                                    loss=${(before > 0) ? ((before - after) / before) * 100 : 0.0}"
                          th:class="${loss >= 45 and loss <= 55 ? 'loss-container loss-normal' : 'loss-container loss-warning'}">
+                        <i class="fas fa-tint me-1"></i>
                         <span th:text="${#numbers.formatDecimal(loss, 1, 1) + '%'}">44.0%</span>
                     </div>
                 </td>
+
+                <!-- Labor Team -->
                 <td>
-                    <span class="labor-text">
-                        <i class="fas fa-users-cog me-1"></i>
+                    <div class="labor-team">
+                        <i class="fas fa-users"></i>
                         <span th:text="${record.labors ?: 'Not Assigned'}">Silva, Perera</span>
-                    </span>
+                    </div>
                 </td>
+
+                <!-- Recorded By -->
                 <td class="text-center">
-                    <span class="fw-bold d-block" style="font-size: 0.85rem;" th:text="${record.officerName ?: 'Unknown'}">Kamal Perera</span>
-                </td>
-                <td class="text-center">
-                    <form th:action="@{/qa/withering/recompute-intake}" method="post" style="display:inline">
-                        <input type="hidden" name="batchId" th:value="${record.batchId}">
-                        <button type="submit" class="btn btn-sm btn-outline-warning">Recompute</button>
-                    </form>
+                    <div class="officer-name" th:text="${record.officerName ?: 'Unknown'}">Kamal Perera</div>
                 </td>
             </tr>
             </tbody>
         </table>
+
+        <!-- No Results Message -->
+        <div class="no-results-message" id="noResultsMsg">
+            <i class="fas fa-search"></i>
+            <p>No withering records found matching your search.</p>
+        </div>
     </div>
 </div>
 
@@ -121,14 +484,26 @@
         const input = document.getElementById("witheringSearch");
         const filter = input.value.toUpperCase();
         const table = document.getElementById("witheringTable");
-        const tr = table.getElementsByTagName("tr");
-        for (let i = 1; i < tr.length; i++) {
-            const textContent = tr[i].textContent || tr[i].innerText;
+        const tbody = table.getElementsByTagName("tbody")[0];
+        const rows = tbody.getElementsByTagName("tr");
+        let visibleCount = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            const textContent = rows[i].textContent || rows[i].innerText;
             if (textContent.toUpperCase().indexOf(filter) > -1) {
-                tr[i].style.display = "";
+                rows[i].style.display = "";
+                visibleCount++;
             } else {
-                tr[i].style.display = "none";
+                rows[i].style.display = "none";
             }
+        }
+
+        // Show/hide no results message
+        const noResultsMsg = document.getElementById("noResultsMsg");
+        if (visibleCount === 0 && filter.length > 0) {
+            noResultsMsg.classList.add("show");
+        } else {
+            noResultsMsg.classList.remove("show");
         }
     }
 </script>
