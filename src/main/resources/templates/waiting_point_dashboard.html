@@ -74,6 +74,7 @@
         .form-select, .form-control { border-radius: 8px; border-color: #e2e8f0; padding: 10px 14px; }
         .form-select:focus, .form-control:focus { border-color: #26523c; box-shadow: 0 0 0 0.2rem rgba(38, 82, 60, 0.15); }
     </style>
+    <div th:replace="~{fragments/pwa-head :: pwaHead}"></div>
 </head>
 <body class="pb-5" th:attr="data-last-officer=${lastOfficer != null ? lastOfficer : ''}, data-last-custom-officer=${lastCustomOfficer != null ? lastCustomOfficer : ''}">
 

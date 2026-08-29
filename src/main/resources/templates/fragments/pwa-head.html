@@ -1,0 +1,12 @@
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="pwaHead">
+    <link rel="manifest" th:href="@{/manifest.json}">
+    <meta name="theme-color" content="#409176">
+    <link rel="apple-touch-icon" th:href="@{/icons/icon-192.png}">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js');
+            });
+        }
+    </script>
+</th:block>

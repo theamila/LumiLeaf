@@ -10,116 +10,122 @@
 
     <style>
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom right, #e6f7ee, #c9efd9);
-        }
+      margin: 0;
+      font-family: Arial, sans-serif;
+    background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('/login-bg.png');
+background-size: contain;
+background-position: center;
+background-repeat: no-repeat;
+background-color: #1b3a2b;
+background-attachment: fixed;
+  }
 
-        .page {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            padding: 15px;
-        }
+          .page {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              padding: 15px;
+          }
 
-        .login-box {
-            background: white;
-            padding: 30px 25px;
-            width: 100%;
-            max-width: 360px;
-            border-radius: 14px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            text-align: center;
-        }
+          .login-box {
+              background: white;
+              padding: 30px 25px;
+              width: 100%;
+              max-width: 360px;
+              border-radius: 14px;
+              box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+              text-align: center;
+          }
 
-        .login-box h2 {
-            margin-bottom: 5px;
-            color: #2c7a4b;
-        }
+          .login-box h2 {
+              margin-bottom: 5px;
+              color: #2c7a4b;
+          }
 
-        .subtitle {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
+          .subtitle {
+              color: #666;
+              font-size: 14px;
+              margin-bottom: 20px;
+          }
 
-        /* Added box-sizing to keep inputs perfectly inside the box */
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
+          /* Added box-sizing to keep inputs perfectly inside the box */
+          input {
+              width: 100%;
+              padding: 12px;
+              margin: 8px 0;
+              border-radius: 8px;
+              border: 1px solid #ccc;
+              font-size: 16px;
+              box-sizing: border-box;
+          }
 
-        input:focus {
-            outline: none;
-            border-color: #2c7a4b;
-        }
+          input:focus {
+              outline: none;
+              border-color: #2c7a4b;
+          }
 
-        /* --- THE FIX: Hide Microsoft Edge's default password reveal eye --- */
-        input[type="password"]::-ms-reveal,
-        input[type="password"]::-ms-clear {
-            display: none;
-        }
-        /* ---------------------------------------------------------------- */
+          /* --- THE FIX: Hide Microsoft Edge's default password reveal eye --- */
+          input[type="password"]::-ms-reveal,
+          input[type="password"]::-ms-clear {
+              display: none;
+          }
+          /* ---------------------------------------------------------------- */
 
-        /* Container for the password field and eye icon */
-        .password-container {
-            position: relative;
-            width: 100%;
-        }
+          /* Container for the password field and eye icon */
+          .password-container {
+              position: relative;
+              width: 100%;
+          }
 
-        /* Added extra padding on the right so text doesn't type over the icon */
-        .password-container input {
-            padding-right: 40px;
-        }
+          /* Added extra padding on the right so text doesn't type over the icon */
+          .password-container input {
+              padding-right: 40px;
+          }
 
-        /* Positioning the eye icon */
-        .toggle-password {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #888;
-            font-size: 18px;
-            transition: color 0.2s;
-        }
+          /* Positioning the eye icon */
+          .toggle-password {
+              position: absolute;
+              right: 15px;
+              top: 50%;
+              transform: translateY(-50%);
+              cursor: pointer;
+              color: #888;
+              font-size: 18px;
+              transition: color 0.2s;
+          }
 
-        .toggle-password:hover {
-            color: #2c7a4b;
-        }
+          .toggle-password:hover {
+              color: #2c7a4b;
+          }
 
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #2c7a4b;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: background 0.2s;
-        }
+          button {
+              width: 100%;
+              padding: 12px;
+              background: #2c7a4b;
+              border: none;
+              border-radius: 8px;
+              color: white;
+              font-size: 16px;
+              cursor: pointer;
+              margin-top: 15px;
+              transition: background 0.2s;
+          }
 
-        button:hover {
-            background: #256b41;
-        }
+          button:hover {
+              background: #256b41;
+          }
 
-        .error {
-            color: #d32f2f;
-            font-size: 14px;
-            margin-top: 15px;
-            background: #ffebee;
-            padding: 8px;
-            border-radius: 6px;
-        }
+          .error {
+              color: #d32f2f;
+              font-size: 14px;
+              margin-top: 15px;
+              background: #ffebee;
+              padding: 8px;
+              border-radius: 6px;
+          }
     </style>
+    <div th:replace="~{fragments/pwa-head :: pwaHead}"></div>
 </head>
 
 <body>

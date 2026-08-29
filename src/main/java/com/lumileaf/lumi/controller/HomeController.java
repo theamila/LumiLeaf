@@ -16,7 +16,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String index() {
-        return "redirect:/login";
+        return "redirect:/trace/notfound";
     }
 
     @GetMapping("/login")
