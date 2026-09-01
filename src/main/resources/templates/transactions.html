@@ -812,69 +812,6 @@
                             </div>
                         </td>
                     </tr>
-                    <!-- Sample rows for preview (remove in production) -->
-                    <tr class="sample-row">
-                        <td>
-                            <div class="timestamp-main">07 May 2025</div>
-                            <div class="timestamp-sub">08:14 AM</div>
-                        </td>
-                        <td>
-                            <div class="officer-name-cell">
-                                <div class="officer-avatar">නි</div>
-                                <span style="font-weight:600; font-size:0.88rem;">නිල්මිණි රත්නායක</span>
-                            </div>
-                        </td>
-                        <td><span class="badge-source">BOP1</span></td>
-                        <td><span class="badge-qty-main">−240.00 KG</span></td>
-                        <td>
-                            <div class="distribution-badges">
-                                <span class="dist-badge">BOP +120.00</span>
-                                <span class="dist-badge">BOPF +80.00</span>
-                                <span class="dist-badge">DUST +40.00</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="sample-row">
-                        <td>
-                            <div class="timestamp-main">06 May 2025</div>
-                            <div class="timestamp-sub">02:32 PM</div>
-                        </td>
-                        <td>
-                            <div class="officer-name-cell">
-                                <div class="officer-avatar">ශ්‍රී</div>
-                                <span style="font-weight:600; font-size:0.88rem;">ශ්‍රීයාල් ජයසිංහ</span>
-                            </div>
-                        </td>
-                        <td><span class="badge-source">OP1</span></td>
-                        <td><span class="badge-qty-main">−180.00 KG</span></td>
-                        <td>
-                            <div class="distribution-badges">
-                                <span class="dist-badge">OPA +90.00</span>
-                                <span class="dist-badge">PEKOE +60.00</span>
-                                <span class="dist-badge">BOP1 +30.00</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="sample-row">
-                        <td>
-                            <div class="timestamp-main">05 May 2025</div>
-                            <div class="timestamp-sub">11:05 AM</div>
-                        </td>
-                        <td>
-                            <div class="officer-name-cell">
-                                <div class="officer-avatar">රු</div>
-                                <span style="font-weight:600; font-size:0.88rem;">රුවන් ගමගේ</span>
-                            </div>
-                        </td>
-                        <td><span class="badge-source">PEKOE</span></td>
-                        <td><span class="badge-qty-main">−95.50 KG</span></td>
-                        <td>
-                            <div class="distribution-badges">
-                                <span class="dist-badge">BOP +55.00</span>
-                                <span class="dist-badge">DUST +40.50</span>
-                            </div>
-                        </td>
-                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -966,16 +903,9 @@
 
         const balanced = Math.abs(sourceVal - targetTotal) < 0.01 && sourceVal > 0;
 
-        if (balanced) {
-            calcLabel.className = 'bal-current ok';
-            balIndicator.className = 'balance-status-indicator ok';
-            balIndicator.innerHTML = '<i class="fas fa-check-circle"></i> Balanced';
-        } else {
-            calcLabel.className = 'bal-current bad';
-            balIndicator.className = 'balance-status-indicator bad';
-            balIndicator.innerHTML = '<i class="fas fa-times-circle"></i> Mismatch';
-        }
-    }
+     calcLabel.className = 'bal-current ok';
+balIndicator.className = 'balance-status-indicator ok';
+balIndicator.innerHTML = '<i class="fas fa-info-circle"></i> ' + targetTotal.toFixed(2) + ' KG distributed';
 
     sourceInput.addEventListener('input', updateBalance);
     targetInputs.forEach(inp => inp.addEventListener('input', updateBalance));
@@ -1013,10 +943,6 @@
             return;
         }
 
-        if (sourceVal <= 0 || Math.abs(sourceVal - targetTotal) > 0.01) {
-            e.preventDefault();
-            Swal.fire({ title: 'Mass Balance Error', text: 'Total distributed weight must exactly match the source quantity.', icon: 'warning', confirmButtonColor: '#1a4a35' });
-        }
     });
 </script>
 </body>

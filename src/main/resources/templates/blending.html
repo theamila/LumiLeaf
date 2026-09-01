@@ -104,12 +104,19 @@
                     </div>
                 </div>
 
-                <a th:href="@{/trace/invoice/{invoiceNumber}(invoiceNumber=${entry.key})}"
-                   target="_blank"
-                   class="btn btn-sm btn-qr rounded-pill px-3 shadow-sm"
-                   title="Open Master Trace & QR">
-                    <i class="fas fa-qrcode me-1"></i> Master QR
-                </a>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/blending/addGrade/{invoiceNumber}(invoiceNumber=${entry.key})}"
+                       class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm"
+                       title="Add another grade to this invoice">
+                        <i class="fas fa-plus me-1"></i> Add Grade
+                    </a>
+                    <a th:href="@{/trace/invoice/{invoiceNumber}(invoiceNumber=${entry.key})}"
+                       target="_blank"
+                       class="btn btn-sm btn-qr rounded-pill px-3 shadow-sm"
+                       title="Open Master Trace & QR">
+                        <i class="fas fa-qrcode me-1"></i> Master QR
+                    </a>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">

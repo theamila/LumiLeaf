@@ -107,9 +107,6 @@
                     <th>Lot #</th>
                     <th>Leaf</th>
                     <th>Actual</th>
-                    <th>OP1</th><th>OPA</th><th>BOP1</th><th>PEKOE</th>
-                    <th>BOP</th><th>BOPF</th><th>EB</th><th>FFSP</th>
-                    <th>FFEXS</th><th>DUST</th><th>BM</th><th>BP</th><th>Refuse</th>
                     <th class="text-end actions-column">Actions</th>
                     <th style="display:none;" class="excel-note-col">Rejection Note</th>
                 </tr>
@@ -130,19 +127,6 @@
 
                     <td class="fw-bold actual-made-total-cell" th:text="${p.actualMadeTea}"></td>
 
-                    <td><input type="number" step="0.1" th:value="${p.op1}" th:data-id="${p.id}" data-field="OP1" onchange="saveInlineValue(this)" onfocus="this.select()" class="inline-cell-input"></td>
-                    <td><input type="number" step="0.1" th:value="${p.opa}" th:data-id="${p.id}" data-field="OPA" onchange="saveInlineValue(this)" onfocus="this.select()" class="inline-cell-input"></td>
-                    <td><input type="number" step="0.1" th:value="${p.bop1}" th:data-id="${p.id}" data-field="BOP1" onchange="saveInlineValue(this)" onfocus="this.select()" class="inline-cell-input"></td>
-                    <td><input type="number" step="0.1" th:value="${p.pekoe}" th:data-id="${p.id}" data-field="PEKOE" onchange="saveInlineValue(this)" onfocus="this.select()" class="inline-cell-input"></td>
-                    <td><input type="number" step="0.1" th:value="${p.bop}" th:data-id="${p.id}" data-field="BOP" onchange="saveInlineValue(this)" onfocus="this.select()" class="inline-cell-input"></td>
-                    <td><input type="number" step="0.1" th:value="${p.bopf}" th:data-id="${p.id}" data-field="BOPF" onchange="saveInlineValue(this)" onfocus="this.select()" class="inline-cell-input"></td>
-                    <td><input type="number" step="0.1" th:value="${p.eb}" th:data-id="${p.id}" data-field="EB" onchange="saveInlineValue(this)" onfocus="this.select()" class="inline-cell-input"></td>
-                    <td><input type="number" step="0.1" th:value="${p.ffsp}" th:data-id="${p.id}" data-field="FFSP" onchange="saveInlineValue(this)" onfocus="this.select()" class="inline-cell-input"></td>
-                    <td><input type="number" step="0.1" th:value="${p.ffexs}" th:data-id="${p.id}" data-field="FFEXS" onchange="saveInlineValue(this)" onfocus="this.select()" class="inline-cell-input"></td>
-                    <td><input type="number" step="0.1" th:value="${p.dust}" th:data-id="${p.id}" data-field="DUST" onchange="saveInlineValue(this)" onfocus="this.select()" class="inline-cell-input"></td>
-                    <td><input type="number" step="0.1" th:value="${p.bm}" th:data-id="${p.id}" data-field="BM" onchange="saveInlineValue(this)" onfocus="this.select()" class="inline-cell-input"></td>
-                    <td><input type="number" step="0.1" th:value="${p.bp}" th:data-id="${p.id}" data-field="BP" onchange="saveInlineValue(this)" onfocus="this.select()" class="inline-cell-input"></td>
-                    <td><input type="number" step="0.1" th:value="${p.refusedTea}" th:data-id="${p.id}" data-field="REFUSE" onchange="saveInlineValue(this)" onfocus="this.select()" class="inline-cell-input"></td>
 
                     <td class="text-end actions-column">
                         <div class="dropdown">
@@ -162,7 +146,7 @@
                                 </li>
                                 <li>
                                     <a class="dropdown-item" href="#"
-                                       th:attr="onclick=|openEditModal('${p.id}', '${#temporals.format(p.productionDate, 'yyyy-MM-dd')}', '${p.lotNumber}', '${p.greenLeavesQty}', '${p.actualMadeTea}', '${p.op1}', '${p.opa}', '${p.bop1}', '${p.pekoe}', '${p.bop}', '${p.bopf}', '${p.eb}', '${p.ffsp}', '${p.ffexs}', '${p.dust}', '${p.bm}', '${p.bp}', '${p.refusedTea}')|">
+                                       th:attr="onclick=|openEditModal('${p.id}', '${#temporals.format(p.productionDate, 'yyyy-MM-dd')}', '${p.lotNumber}', '${p.greenLeavesQty}', '${p.actualMadeTea}')|">
                                         <i class="fas fa-edit me-2 text-primary"></i>Edit
                                     </a>
                                 </li>
@@ -204,20 +188,6 @@
                         <div class="col-md-3"><label class="small fw-bold">Green Leaf (kg)</label><input type="number" step="0.1" name="greenLeavesQty" id="fGreen" class="form-control" onfocus="this.select()"></div>
                         <div class="col-md-3"><label class="small fw-bold">Actual Made (kg)</label><input type="number" step="0.1" name="actualMadeTea" id="fActual" class="form-control" onfocus="this.select()" required></div>
 
-                        <div class="col-12 mt-4"><h6 class="fw-bold text-success border-bottom pb-2">Tea Grades (kg)</h6></div>
-                        <div class="col-md-2"><label>OP1</label><input type="number" step="0.1" name="op1" id="fOp1" class="form-control" onfocus="this.select()"></div>
-                        <div class="col-md-2"><label>OPA</label><input type="number" step="0.1" name="opa" id="fOpa" class="form-control" onfocus="this.select()"></div>
-                        <div class="col-md-2"><label>BOP1</label><input type="number" step="0.1" name="bop1" id="fBop1" class="form-control" onfocus="this.select()"></div>
-                        <div class="col-md-2"><label>PEKOE</label><input type="number" step="0.1" name="pekoe" id="fPekoe" class="form-control" onfocus="this.select()"></div>
-                        <div class="col-md-2"><label>BOP</label><input type="number" step="0.1" name="bop" id="fBop" class="form-control" onfocus="this.select()"></div>
-                        <div class="col-md-2"><label>BOPF</label><input type="number" step="0.1" name="bopf" id="fBopf" class="form-control" onfocus="this.select()"></div>
-                        <div class="col-md-2"><label>EB</label><input type="number" step="0.1" name="eb" id="fEb" class="form-control" onfocus="this.select()"></div>
-                        <div class="col-md-2"><label>FFSP</label><input type="number" step="0.1" name="ffsp" id="fFfsp" class="form-control" onfocus="this.select()"></div>
-                        <div class="col-md-2"><label>FFEXS</label><input type="number" step="0.1" name="ffexs" id="fFfexs" class="form-control" onfocus="this.select()"></div>
-                        <div class="col-md-2"><label>DUST</label><input type="number" step="0.1" name="dust" id="fDust" class="form-control" onfocus="this.select()"></div>
-                        <div class="col-md-2"><label>BM</label><input type="number" step="0.1" name="bm" id="fBm" class="form-control" onfocus="this.select()"></div>
-                        <div class="col-md-2"><label>BP</label><input type="number" step="0.1" name="bp" id="fBp" class="form-control" onfocus="this.select()"></div>
-                        <div class="col-md-2"><label>REFUSE</label><input type="number" step="0.1" name="refusedTea" id="fRefuse" class="form-control" onfocus="this.select()"></div>
                     </div>
                 </div>
                 <div class="modal-footer border-0 px-4 pb-4">
@@ -367,27 +337,14 @@
     clearBtn.onclick = () => { searchInput.value = ""; searchInput.dispatchEvent(new Event('keyup')); };
 
     // --- 2. MODAL LOGIC (EDIT/INSERT) ---
-    function openEditModal(id, date, lot, green, actual, op1, opa, bop1, pekoe, bop, bopf, eb, ffsp, ffexs, dust, bm, bp, refuse) {
-        document.getElementById('fId').value = id;
-        document.getElementById('fDate').value = date;
-        document.getElementById('fLot').value = lot;
-        document.getElementById('fGreen').value = green;
-        document.getElementById('fActual').value = actual;
-        document.getElementById('fOp1').value = op1;
-        document.getElementById('fOpa').value = opa;
-        document.getElementById('fBop1').value = bop1;
-        document.getElementById('fPekoe').value = pekoe;
-        document.getElementById('fBop').value = bop;
-        document.getElementById('fBopf').value = bopf;
-        document.getElementById('fEb').value = eb;
-        document.getElementById('fFfsp').value = ffsp;
-        document.getElementById('fFfexs').value = ffexs;
-        document.getElementById('fDust').value = dust;
-        document.getElementById('fBm').value = bm;
-        document.getElementById('fBp').value = bp;
-        document.getElementById('fRefuse').value = refuse;
-        new bootstrap.Modal(document.getElementById('entryModal')).show();
-    }
+   function openEditModal(id, date, lot, green, actual) {
+    document.getElementById('fId').value = id;
+    document.getElementById('fDate').value = date;
+    document.getElementById('fLot').value = lot;
+    document.getElementById('fGreen').value = green;
+    document.getElementById('fActual').value = actual;
+    new bootstrap.Modal(document.getElementById('entryModal')).show();
+}
 
     function clearForm() {
         document.getElementById('prodForm').reset();
@@ -447,17 +404,6 @@
         if (actualMade > greenLeaf) {
             event.preventDefault();
             Swal.fire({ icon: 'error', title: 'Invalid Weight', text: `Actual Made (${actualMade} kg) cannot be greater than Green Leaf (${greenLeaf} kg).` });
-            return;
-        }
-
-        const gradeIds = ['fOp1', 'fOpa', 'fBop1', 'fPekoe', 'fBop', 'fBopf', 'fEb', 'fFfsp', 'fFfexs', 'fDust', 'fBm', 'fBp', 'fRefuse'];
-        let sumGrades = 0;
-
-        gradeIds.forEach(id => { sumGrades += parseFloat(document.getElementById(id).value) || 0; });
-
-        if (parseFloat(sumGrades.toFixed(2)) > parseFloat(actualMade.toFixed(2))) {
-            event.preventDefault();
-            Swal.fire({ icon: 'error', title: 'Grades Exceed Total', text: `The sum of all tea grades (${sumGrades.toFixed(2)} kg) cannot be greater than your Actual Made total (${actualMade} kg).` });
             return;
         }
     });
