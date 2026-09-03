@@ -594,6 +594,8 @@ public class ProductionController {
             node.put("batchNumber", item.getBatchNumber());
             node.put("blendingRef", item.getBlendingNumber());
             node.put("status", item.getStatus());
+            node.put("stockLot", null);
+            node.put("stockBatches", null);
 
             if (!"FROM-REMNANTS".equals(item.getBatchNumber())) {
                 String batchId = item.getBatchNumber();
