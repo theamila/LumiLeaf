@@ -913,7 +913,7 @@ balIndicator.innerHTML = '<i class="fas fa-info-circle"></i> ' + targetTotal.toF
     // ── Fix: select existing value on focus so typing replaces it instead of appending after the default "0" ──
     function selectOnFocus() { this.select(); }
     sourceInput.addEventListener('focus', selectOnFocus);
-    targetInputs.forEach(inp => inp.addEventListener('focus', selectOnFocus));
+    targetInputs.forEach(inp => inp.addEventListener('focus', selectOnFocus));}
 
     // ── Fix: stop mouse-wheel scroll from silently incrementing/decrementing number inputs ──
     // (When the page scrolls while the cursor happens to be resting over a focused number input,
