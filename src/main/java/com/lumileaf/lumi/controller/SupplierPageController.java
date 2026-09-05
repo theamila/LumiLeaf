@@ -32,6 +32,12 @@ public class SupplierPageController {
     private final SupplierRepository supplierRepository;
     private final String UPLOAD_DIR = "./uploads/";
 
+    @org.springframework.beans.factory.annotation.Value("${azure.storage.connection-string}")
+    private String blobConnectionString;
+
+    @org.springframework.beans.factory.annotation.Value("${azure.storage.container-name}")
+    private String blobContainerName;
+
     public SupplierPageController(SupplierRepository supplierRepository) {
         this.supplierRepository = supplierRepository;
     }
@@ -98,18 +104,25 @@ public class SupplierPageController {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Only PNG or JPG images are allowed"));
         }
 
-        try {
-            Path uploadPath = Paths.get(UPLOAD_DIR);
-            if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
+        if (blobConnectionString == null || blobConnectionString.isBlank()) {
+            return ResponseEntity.status(503).body(Map.of("success", false, "message", "Photo storage is not configured yet."));
+        }
 
+        try {
             String extension = contentType.equals("image/png") ? ".png" : ".jpg";
             String fileName = "supplier_" + supplierId + "_" + (isLandPhoto ? "land_" : "photo_")
                     + System.currentTimeMillis() + extension;
-            Path filePath = uploadPath.resolve(fileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            com.azure.storage.blob.BlobServiceClient blobServiceClient = new com.azure.storage.blob.BlobServiceClientBuilder()
+                    .connectionString(blobConnectionString)
+                    .buildClient();
+            com.azure.storage.blob.BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(blobContainerName);
+            com.azure.storage.blob.BlobClient blobClient = containerClient.getBlobClient(fileName);
+
+            blobClient.upload(file.getInputStream(), file.getSize(), true);
 
             Supplier s = supplierOpt.get();
-            String publicPath = "/uploads/" + fileName;
+            String publicPath = blobClient.getBlobUrl();
             if (isLandPhoto) {
                 s.setLandPhotoUrl(publicPath);
             } else {
@@ -122,7 +135,6 @@ public class SupplierPageController {
             return ResponseEntity.internalServerError().body(Map.of("success", false, "message", "Upload failed: " + e.getMessage()));
         }
     }
-
     @PostMapping("/supplier/save")
     public String saveSupplier(@ModelAttribute Supplier supplier) {
         Optional<Supplier> existingSupplier = supplierRepository.findBySupplierId(supplier.getSupplierId());
@@ -192,7 +204,7 @@ public class SupplierPageController {
 
                             supplierRepository.save(newSupplier);
                         } else {
-                            // දැනටමත් ඉන්නවා නම්, සමහර විට Route එක update වෙලා තියෙන්න පුළුවන් නිසා route එක විතරක් update කරන්න පුළුවන් (Optional)
+
                             Supplier existingSupplier = existing.get();
                             if(existingSupplier.getSection() == null || !existingSupplier.getSection().equals(routeName)){
                                 existingSupplier.setSection(routeName);

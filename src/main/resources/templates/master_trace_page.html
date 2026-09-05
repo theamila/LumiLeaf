@@ -225,6 +225,7 @@
 
             <!-- Stock Production lot summary (if this trace node references a consolidated stock lot) -->
             <div th:if="${node.stockLot != null}" class="mb-3 p-3 bg-light rounded-3 border d-print-none">
+                <!-- AFTER: -->
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div>
                         <div class="small text-muted">Stock Lot</div>
@@ -232,6 +233,12 @@
                         <div class="small text-muted">Status: <span th:text="${node.stockLot.status}"></span></div>
                     </div>
                     <div class="text-end">
+                        <a th:if="${node.stockLot.pdfReportPath != null and node.stockLot.pdfReportPath != ''}"
+                           th:href="@{'/api/stock/view-pdf/' + ${node.stockLot.id}}"
+                           target="_blank"
+                           class="btn btn-sm btn-outline-primary rounded-pill">
+                            <i class="fas fa-file-pdf me-1"></i> View Lab Report
+                        </a>
                     </div>
                 </div>
 

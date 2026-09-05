@@ -56,6 +56,7 @@
     const grade = /*[[${blend.grade}]]*/ '';
     const invoiceNumber = /*[[${blend.invoiceNumber}]]*/ '';
     const lotNumber = /*[[${blend.batchNumber}]]*/ '';
+const buyerName = /*[[${blend.buyerInfo}]]*/ '';
     const tareWeight = /*[[${tareWeight}]]*/ 1.7;
     const qrCode = /*[[${qrCode}]]*/ '';
     let packages = /*[[${defaultPackages}]]*/ [];
@@ -121,7 +122,8 @@
                 <div class="weight-row"><span class="label">TARE WEIGHT</span><span>: ${tareWeight.toFixed(3)}Kg</span></div>
                 <div class="weight-row"><span class="label">GROSS WEIGHT</span><span>: ${grossWeight.toFixed(3)}Kg</span></div>
                                <div class="invoice-line">INVOICE NO : ${invoiceNumber}</div>
-                <div class="lot-line">LOT :- ${lotNumber}</div>
+               <div class="lot-line">LOT :- ${lotNumber}</div>
+<div class="lot-line" style="font-size:0.85rem;">BUYER : ${buyerName}</div>
                 <div class="site-line">www.lumbiniteavalley.com</div>
             `;
             sheet.appendChild(div);

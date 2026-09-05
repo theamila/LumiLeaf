@@ -27,6 +27,8 @@ import com.lumileaf.lumi.model.FarmerContribution;
 import org.springframework.beans.factory.annotation.Value;
 import com.lumileaf.lumi.model.Buyer;
 import com.lumileaf.lumi.repository.BuyerRepository;
+import com.lumileaf.lumi.model.GradeTransaction;
+import com.lumileaf.lumi.repository.GradeTransactionRepository;
 
 
 @Controller
@@ -39,6 +41,7 @@ public class BlendingController {
     @Autowired private BlendBalanceRepository blendBalanceRepo;
     @Autowired private ContributionService contributionService;
     @Autowired private BuyerRepository buyerRepo;
+    @Autowired private GradeTransactionRepository txRepo;
     private Map<String, List<Blending>> buildGroupedBlends() {
         return blendingRepo.findAll().stream()
                 .collect(Collectors.groupingBy(Blending::getInvoiceNumber));
@@ -84,9 +87,10 @@ public class BlendingController {
             // ── FIX (BlendingController #6): include Stock Production lots in the total.
             // Only APPROVED (lab-approved) lots count, matching the same rule already
             // applied to ProductionBatch above.
+            // AFTER:
             double stockProdStock = stockProductionRepo.findAll().stream()
                     .filter(sp -> "APPROVED".equals(sp.getStatus()))
-                    .mapToDouble(sp -> getStockForGrade(sp, g)).sum();
+                    .mapToDouble(sp -> applyTransactionAdjustments(sp, g)).sum();
 
             double remnantStock = blendBalanceRepo.findAll().stream()
                     .mapToDouble(b -> getGradeValueFromBalance(b, g)).sum();
@@ -100,6 +104,36 @@ public class BlendingController {
             summary.put(g, Math.max(0.0, available));
         }
         return summary;
+
+    }private double applyTransactionAdjustments(StockProduction sp, String grade) {
+        double amount = getStockForGrade(sp, grade);
+        if (sp.getLotNumber() == null) return amount;
+
+        for (GradeTransaction tx : txRepo.findAll()) {
+            if (!sp.getLotNumber().equals(tx.getSourceLotNumber())) continue;
+
+            if (tx.getSourceGrade() != null && grade.equalsIgnoreCase(tx.getSourceGrade())) {
+                amount -= (tx.getSourceQty() != null ? tx.getSourceQty() : 0.0);
+            }
+            Double targetVal = switch (grade.toUpperCase()) {
+                case "OP1" -> tx.getOp1();
+                case "OPA" -> tx.getOpa();
+                case "BOP1" -> tx.getBop1();
+                case "PEKOE" -> tx.getPekoe();
+                case "BOP" -> tx.getBop();
+                case "BOPF" -> tx.getBopf();
+                case "EB" -> tx.getEb();
+                case "FFSP" -> tx.getFfsp();
+                case "FFEXS" -> tx.getFfexs();
+                case "DUST" -> tx.getDust();
+                case "BM" -> tx.getBm();
+                case "BP" -> tx.getBp();
+                case "REFUSE" -> tx.getRefusedTea();
+                default -> null;
+            };
+            amount += (targetVal != null) ? targetVal : 0.0;
+        }
+        return amount;
     }
     @GetMapping("/api/blending/{id}/contributions")
     @ResponseBody
@@ -194,14 +228,17 @@ public class BlendingController {
         // exist in both maps at once; in steady state this never triggers because a
         // batch's status is exclusively either APPROVED (in Production) or CONSOLIDATED
         // (moved to Stock Production), never both simultaneously.
+        // AFTER:
         List<StockProduction> relevantStockLots = stockProductionRepo.findAll().stream()
                 .filter(sp -> "APPROVED".equals(sp.getStatus()))
-                .filter(sp -> getStockForGrade(sp, upperGrade) > 0)
+                .filter(sp -> applyTransactionAdjustments(sp, upperGrade) > 0)
                 .collect(Collectors.toList());
 
+        // AFTER:
         for (StockProduction sp : relevantStockLots) {
             String lot = sp.getLotNumber();
-            double originalQty = getStockForGrade(sp, upperGrade);
+            double originalQty = applyTransactionAdjustments(sp, upperGrade);
+
             double usedQty = Optional.ofNullable(blendingRepo.sumQuantityByBatchAndGrade(lot, upperGrade)).orElse(0.0);
             double remaining = originalQty - usedQty;
 
@@ -294,8 +331,9 @@ public class BlendingController {
                 Optional<StockProduction> stockOpt = stockProductionRepo.findByLotNumber(blending.getBatchNumber())
                         .filter(sp -> "APPROVED".equals(sp.getStatus()));
 
+                // AFTER:
                 if (stockOpt.isPresent()) {
-                    double originalQty = getStockForGrade(stockOpt.get(), blending.getGrade());
+                    double originalQty = applyTransactionAdjustments(stockOpt.get(), blending.getGrade());
                     double usedQty = Optional.ofNullable(blendingRepo.sumQuantityByBatchAndGrade(blending.getBatchNumber(), blending.getGrade())).orElse(0.0);
                     double available = originalQty - usedQty;
 

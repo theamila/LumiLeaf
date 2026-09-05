@@ -16,6 +16,7 @@ public class GradeTransaction {
 
     private String sourceGrade;
     private Double sourceQty;
+    private String sourceLotNumber;   // NEW
 
     // Resulting Target Grades
     private Double op1=0.0, opa=0.0, bop1=0.0, pekoe=0.0, bop=0.0, bopf=0.0, eb=0.0, ffsp=0.0, ffexs=0.0, dust=0.0, bm=0.0, bp=0.0, refusedTea=0.0;
@@ -33,6 +34,8 @@ public class GradeTransaction {
     public void setSourceGrade(String sourceGrade) { this.sourceGrade = sourceGrade; }
     public Double getSourceQty() { return sourceQty; }
     public void setSourceQty(Double sourceQty) { this.sourceQty = sourceQty; }
+    public String getSourceLotNumber() { return sourceLotNumber; }
+    public void setSourceLotNumber(String sourceLotNumber) { this.sourceLotNumber = sourceLotNumber; }
 
     public Double getOp1() { return op1; } public void setOp1(Double op1) { this.op1 = op1; }
     public Double getOpa() { return opa; } public void setOpa(Double opa) { this.opa = opa; }

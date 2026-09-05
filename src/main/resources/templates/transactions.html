@@ -678,6 +678,11 @@
                                 <i class="fas fa-box"></i>
                                 Available: <strong id="availableAmount">0.00</strong> KG
                             </div>
+                            <!-- NEW -->
+                            <label class="field-label mt-3">Source Lot</label>
+                            <select name="sourceLotNumber" id="sourceLot" class="form-select" required disabled>
+                                <option value="">— Select Grade First —</option>
+                            </select>
                         </div>
                         <div class="col-md-5">
                             <label class="field-label">Quantity to Remove (KG)</label>
@@ -772,6 +777,7 @@
                         <th>Date & Time</th>
                         <th>Officer</th>
                         <th>Source Grade</th>
+                        <th>Lot</th>
                         <th>Removed</th>
                         <th>Distributed Into</th>
                         <th>Balance</th>
@@ -793,6 +799,8 @@
                             </div>
                         </td>
                         <td><span class="badge-source" th:text="${tx.sourceGrade}">BOP</span></td>
+                        <!-- NEW -->
+                        <td><span class="dist-badge" th:text="${tx.sourceLotNumber}"></span></td>
                         <td><span class="badge-qty-main" th:text="'−' + ${tx.sourceQty} + ' KG'">−120 KG</span></td>
                         <td>
                             <div class="distribution-badges">
@@ -871,18 +879,49 @@
         .catch(() => {}); // graceful if API not available in preview
 
     // ── Source grade change ──
+    const sourceLotSelect = document.getElementById('sourceLot');
     sourceSelect.addEventListener('change', function() {
-        const key = this.value === "REFUSEDTEA" ? "REFUSE" : this.value;
-        const available = stockData[key] || 0;
         const label = this.options[this.selectedIndex].text.split('—')[0].trim();
+        sourceLotSelect.innerHTML = '<option value="">— Loading —</option>';
+        sourceLotSelect.disabled = true;
+        stockPill.classList.remove('show');
+        availableSpan.textContent = '0.00';
 
         if (this.value) {
-            stockPill.classList.add('show');
-            availableSpan.textContent = available.toFixed(2);
             selectedBig.textContent = label;
+            fetch('/api/qa/stock-lots?grade=' + encodeURIComponent(this.value))
+                .then(res => res.json())
+                .then(lots => {
+                    sourceLotSelect.innerHTML = '<option value="">— Select Lot —</option>';
+                    Object.keys(lots).forEach(lot => {
+                        const opt = document.createElement('option');
+                        opt.value = lot;
+                        opt.textContent = lot + ' (' + lots[lot].toFixed(2) + ' KG)';
+                        opt.dataset.amount = lots[lot];
+                        sourceLotSelect.appendChild(opt);
+                    });
+                    sourceLotSelect.disabled = false;
+                })
+                .catch(() => {
+                    sourceLotSelect.innerHTML = '<option value="">— Failed to load —</option>';
+                });
+        } else {
+            selectedBig.textContent = '—';
+            sourceLotSelect.innerHTML = '<option value="">— Select Grade First —</option>';
+        }
+        updateBalance();
+    });
+
+    // NEW listener
+    sourceLotSelect.addEventListener('change', function() {
+        const opt = this.options[this.selectedIndex];
+        const amount = opt && opt.dataset.amount ? parseFloat(opt.dataset.amount) : 0;
+        if (this.value) {
+            stockPill.classList.add('show');
+            availableSpan.textContent = amount.toFixed(2);
         } else {
             stockPill.classList.remove('show');
-            selectedBig.textContent = '—';
+            availableSpan.textContent = '0.00';
         }
         updateBalance();
     });

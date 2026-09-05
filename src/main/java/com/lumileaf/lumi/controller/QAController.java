@@ -336,6 +336,41 @@ public class QAController {
         Double v = getRawBalanceValue(balance, grade);
         return (v != null) ? v : 0.0;
     }
+    @GetMapping("/api/qa/stock-lots")
+    @ResponseBody
+    public Map<String, Double> getStockLotsForGrade(@RequestParam String grade) {
+        Map<String, Double> lotMap = new HashMap<>();
+        List<GradeTransaction> transactions = txRepo.findAll();
+        String normalizedGrade = "REFUSEDTEA".equalsIgnoreCase(grade) ? "REFUSE" : grade.toUpperCase();
+
+        for (StockProduction sp : stockProductionRepo.findAll()) {
+            if ("REJECTED".equals(sp.getStatus())) continue;
+            if (sp.getLotNumber() == null) continue;
+
+            Double rawVal = getRawStockProdValue(sp, normalizedGrade);
+            double amount = (rawVal != null) ? rawVal : 0.0;
+
+            for (GradeTransaction tx : transactions) {
+                if (sp.getLotNumber().equals(tx.getSourceLotNumber())) {
+                    // Subtract what was moved OUT of this lot as the source grade
+                    if (tx.getSourceGrade() != null &&
+                            (normalizedGrade.equalsIgnoreCase(tx.getSourceGrade()) ||
+                                    (normalizedGrade.equals("REFUSE") && "REFUSEDTEA".equalsIgnoreCase(tx.getSourceGrade())))) {
+                        amount -= (tx.getSourceQty() != null ? tx.getSourceQty() : 0.0);
+                    }
+                    // Add back whatever landed in this lot as a target grade
+                    Double targetVal = getRawTxValue(tx, normalizedGrade);
+                    amount += (targetVal != null) ? targetVal : 0.0;
+                }
+            }
+
+            amount = round(amount);
+            if (amount > 0) {
+                lotMap.put(sp.getLotNumber(), amount);
+            }
+        }
+        return lotMap;
+    }
 
     // --------------------------------------------------
     // 2. DRYING RECORDS QA CONTROLS
@@ -994,13 +1029,18 @@ public class QAController {
         String sourceGrade = params.get("sourceGrade");
         double sourceQty = safeParse(params.get("sourceQty"));
 
-        Map<String, Double> currentStock = getGradeStock();
-        String stockKey = "REFUSEDTEA".equalsIgnoreCase(sourceGrade) ?
-                "REFUSE" : sourceGrade.toUpperCase();
-        double availableAmount = currentStock.getOrDefault(stockKey, 0.0);
+
+        String sourceLotNumber = params.get("sourceLotNumber");
+        if (sourceLotNumber == null || sourceLotNumber.trim().isEmpty()) {
+            ra.addFlashAttribute("error", "Failed: A source lot must be selected.");
+            return "redirect:/transactions";
+        }
+
+        Map<String, Double> lotStock = getStockLotsForGrade(sourceGrade);
+        double availableAmount = lotStock.getOrDefault(sourceLotNumber, 0.0);
 
         if (sourceQty > availableAmount) {
-            ra.addFlashAttribute("error", "Failed: Insufficient stock in " + sourceGrade +
+            ra.addFlashAttribute("error", "Failed: Insufficient stock in lot " + sourceLotNumber + " for " + sourceGrade +
                     ". Available: " + availableAmount + "kg, Requested: " + sourceQty + "kg");
             return "redirect:/transactions";
         }
@@ -1014,6 +1054,7 @@ public class QAController {
                 : (String) session.getAttribute("username"));
 
         tx.setSourceGrade(sourceGrade);
+        tx.setSourceLotNumber(sourceLotNumber);
         tx.setSourceQty(sourceQty);
 
         tx.setOp1(safeParse(params.get("op1")));
