@@ -38,6 +38,28 @@ public class SupplierPageController {
     @org.springframework.beans.factory.annotation.Value("${azure.storage.container-name}")
     private String blobContainerName;
 
+    private String generateSasUrl(String plainBlobUrl) {
+        if (plainBlobUrl == null || plainBlobUrl.isBlank()) return plainBlobUrl;
+        if (blobConnectionString == null || blobConnectionString.isBlank()) return plainBlobUrl;
+        try {
+            // Extract the blob name from the stored plain URL (last path segment)
+            String blobName = plainBlobUrl.substring(plainBlobUrl.lastIndexOf('/') + 1);
+            com.azure.storage.blob.BlobServiceClient blobServiceClient = new com.azure.storage.blob.BlobServiceClientBuilder()
+                    .connectionString(blobConnectionString)
+                    .buildClient();
+            com.azure.storage.blob.BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(blobContainerName);
+            com.azure.storage.blob.BlobClient blobClient = containerClient.getBlobClient(blobName);
+            com.azure.storage.blob.sas.BlobSasPermission permission = new com.azure.storage.blob.sas.BlobSasPermission().setReadPermission(true);
+            com.azure.storage.blob.sas.BlobServiceSasSignatureValues sasValues =
+                    new com.azure.storage.blob.sas.BlobServiceSasSignatureValues(
+                            java.time.OffsetDateTime.now().plusHours(24), permission);
+            String sasToken = blobClient.generateSas(sasValues);
+            return blobClient.getBlobUrl() + "?" + sasToken;
+        } catch (Exception e) {
+            return plainBlobUrl; // fall back to plain URL if SAS generation fails
+        }
+    }
+
     public SupplierPageController(SupplierRepository supplierRepository) {
         this.supplierRepository = supplierRepository;
     }
@@ -72,12 +94,13 @@ public class SupplierPageController {
         detail.put("supplierId", s.getSupplierId());
         detail.put("name", s.getName());
         detail.put("section", s.getSection());
-        detail.put("photoUrl", s.getPhotoUrl());
-        detail.put("landPhotoUrl", s.getLandPhotoUrl());
+        detail.put("photoUrl", generateSasUrl(s.getPhotoUrl()));
+        detail.put("landPhotoUrl", generateSasUrl(s.getLandPhotoUrl()));
         detail.put("latitude", s.getLatitude());
         detail.put("longitude", s.getLongitude());
         return ResponseEntity.ok(detail);
     }
+
     @PostMapping("/api/supplier/{supplierId}/upload-photo")
     @ResponseBody
     public ResponseEntity<?> uploadFarmerPhoto(@PathVariable String supplierId, @RequestParam("file") MultipartFile file) {
@@ -89,6 +112,7 @@ public class SupplierPageController {
     public ResponseEntity<?> uploadLandPhoto(@PathVariable String supplierId, @RequestParam("file") MultipartFile file) {
         return handlePhotoUpload(supplierId, file, true);
     }
+
 
     private ResponseEntity<?> handlePhotoUpload(String supplierId, MultipartFile file, boolean isLandPhoto) {
         Optional<Supplier> supplierOpt = supplierRepository.findBySupplierId(supplierId);
@@ -130,11 +154,12 @@ public class SupplierPageController {
             }
             supplierRepository.save(s);
 
-            return ResponseEntity.ok(Map.of("success", true, "url", publicPath));
+            return ResponseEntity.ok(Map.of("success", true, "url", generateSasUrl(publicPath)));
         } catch (IOException e) {
             return ResponseEntity.internalServerError().body(Map.of("success", false, "message", "Upload failed: " + e.getMessage()));
         }
     }
+
     @PostMapping("/supplier/save")
     public String saveSupplier(@ModelAttribute Supplier supplier) {
         Optional<Supplier> existingSupplier = supplierRepository.findBySupplierId(supplier.getSupplierId());
