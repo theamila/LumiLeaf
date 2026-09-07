@@ -4,6 +4,8 @@ import com.lumileaf.lumi.model.Admin;
 import com.lumileaf.lumi.repository.AdminRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +17,9 @@ public class HomeController {
     private AdminRepository adminRepository;
 
     @GetMapping("/")
-    public String index() {
-        return "redirect:/trace/notfound";
+    public ResponseEntity<Void> index() {
+        // Return 404 so the base domain does not show the login page or redirect to trace/notfound.
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @GetMapping("/login")

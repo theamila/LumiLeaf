@@ -9,121 +9,126 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* Page background: use cover so mobile fills the screen; avoid background-attachment:fixed */
         body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-    background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('/login-bg.png');
-background-size: contain;
-background-position: center;
-background-repeat: no-repeat;
-background-color: #1b3a2b;
-background-attachment: fixed;
-  }
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+                        url('/login-bg.png') center center / cover no-repeat;
+            -webkit-background-size: cover;
+            background-color: #1b3a2b;
+            background-attachment: scroll;
+        }
 
-          .page {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              height: 100vh;
-              padding: 15px;
-          }
+        /* Use dynamic viewport-aware height for mobile PWAs */
+        .page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100dvh; /* uses dynamic viewport height on mobile */
+            height: 100%;
+            padding: 15px;
+        }
 
-          .login-box {
-              background: white;
-              padding: 30px 25px;
-              width: 100%;
-              max-width: 360px;
-              border-radius: 14px;
-              box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-              text-align: center;
-          }
+        .login-box {
+            background: rgba(255,255,255,0.95);
+            padding: 30px 25px;
+            width: 100%;
+            max-width: 360px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
 
-          .login-box h2 {
-              margin-bottom: 5px;
-              color: #2c7a4b;
-          }
+        .login-box h2 {
+            margin-bottom: 5px;
+            color: #2c7a4b;
+        }
 
-          .subtitle {
-              color: #666;
-              font-size: 14px;
-              margin-bottom: 20px;
-          }
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
 
-          /* Added box-sizing to keep inputs perfectly inside the box */
-          input {
-              width: 100%;
-              padding: 12px;
-              margin: 8px 0;
-              border-radius: 8px;
-              border: 1px solid #ccc;
-              font-size: 16px;
-              box-sizing: border-box;
-          }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
 
-          input:focus {
-              outline: none;
-              border-color: #2c7a4b;
-          }
+        input:focus {
+            outline: none;
+            border-color: #2c7a4b;
+        }
 
-          /* --- THE FIX: Hide Microsoft Edge's default password reveal eye --- */
-          input[type="password"]::-ms-reveal,
-          input[type="password"]::-ms-clear {
-              display: none;
-          }
-          /* ---------------------------------------------------------------- */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+            display: none;
+        }
 
-          /* Container for the password field and eye icon */
-          .password-container {
-              position: relative;
-              width: 100%;
-          }
+        .password-container {
+            position: relative;
+            width: 100%;
+        }
 
-          /* Added extra padding on the right so text doesn't type over the icon */
-          .password-container input {
-              padding-right: 40px;
-          }
+        .password-container input {
+            padding-right: 40px;
+        }
 
-          /* Positioning the eye icon */
-          .toggle-password {
-              position: absolute;
-              right: 15px;
-              top: 50%;
-              transform: translateY(-50%);
-              cursor: pointer;
-              color: #888;
-              font-size: 18px;
-              transition: color 0.2s;
-          }
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+            font-size: 18px;
+            transition: color 0.2s;
+        }
 
-          .toggle-password:hover {
-              color: #2c7a4b;
-          }
+        .toggle-password:hover {
+            color: #2c7a4b;
+        }
 
-          button {
-              width: 100%;
-              padding: 12px;
-              background: #2c7a4b;
-              border: none;
-              border-radius: 8px;
-              color: white;
-              font-size: 16px;
-              cursor: pointer;
-              margin-top: 15px;
-              transition: background 0.2s;
-          }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #2c7a4b;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
 
-          button:hover {
-              background: #256b41;
-          }
+        button:hover {
+            background: #256b41;
+        }
 
-          .error {
-              color: #d32f2f;
-              font-size: 14px;
-              margin-top: 15px;
-              background: #ffebee;
-              padding: 8px;
-              border-radius: 6px;
-          }
+        .error {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-top: 15px;
+            background: #ffebee;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        /* Optional small-screen tweaks */
+        @media (max-width: 420px) {
+            .login-box {
+                padding: 22px 16px;
+                border-radius: 12px;
+            }
+            .login-box h2 { font-size: 20px; }
+        }
     </style>
     <div th:replace="~{fragments/pwa-head :: pwaHead}"></div>
 </head>
@@ -161,7 +166,6 @@ background-attachment: fixed;
 </div>
 
 <script>
-    // Simple script to toggle password visibility
     function togglePasswordVisibility() {
         const passwordField = document.getElementById("passwordField");
         const toggleIcon = document.getElementById("toggleIcon");
@@ -169,11 +173,11 @@ background-attachment: fixed;
         if (passwordField.type === "password") {
             passwordField.type = "text";
             toggleIcon.classList.remove("fa-eye");
-            toggleIcon.classList.add("fa-eye-slash"); // Changes icon to eye with a slash
+            toggleIcon.classList.add("fa-eye-slash");
         } else {
             passwordField.type = "password";
             toggleIcon.classList.remove("fa-eye-slash");
-            toggleIcon.classList.add("fa-eye"); // Changes icon back to normal eye
+            toggleIcon.classList.add("fa-eye");
         }
     }
 </script>
