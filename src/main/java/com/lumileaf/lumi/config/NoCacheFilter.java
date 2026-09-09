@@ -21,7 +21,6 @@ public class NoCacheFilter implements Filter {
         boolean isPublic = path.startsWith("/trace/")
                 || path.startsWith("/css/")
                 || path.startsWith("/js/")
-                || path.equals("/login")
                 || path.startsWith("/lumbini_logo.png")
                 || path.startsWith("/style.css");
 
