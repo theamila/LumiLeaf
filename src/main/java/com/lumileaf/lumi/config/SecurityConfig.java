@@ -38,14 +38,18 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/api/**"))
                 )
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/", "/index", "/login", "/trace/**",
                                 "/manifest.json", "/sw.js",
-                                "/icons/**", "/css/**", "/js/**", "/images/**", "/uploads/**", "/static/**"
+                                "/icons/**", "/css/**", "/js/**", "/images/**", "/uploads/**", "/static/**",
+                                "/api/supplier/*/detail", "/api/production/*/contributions"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
+
+
                 .formLogin(form -> form
                         .loginPage("/login").permitAll()
                         .successHandler((request, response, authentication) -> {

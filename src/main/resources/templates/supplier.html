@@ -275,15 +275,26 @@
         document.getElementById('photoUploadSection').style.display = 'flex';
         document.getElementById('photoUploadHint').style.display = 'none';
 
-        const farmerPreview = document.getElementById('farmerPhotoPreview');
-        farmerPreview.innerHTML = (photoUrl && photoUrl !== 'null' && photoUrl !== 'undefined')
-            ? `<img src="${photoUrl}" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">`
+       const farmerPreview = document.getElementById('farmerPhotoPreview');
+const landPreview = document.getElementById('landPhotoPreview');
+farmerPreview.innerHTML = '<span class="text-muted small">Loading...</span>';
+landPreview.innerHTML = '<span class="text-muted small">Loading...</span>';
+
+fetch(`/api/supplier/${supplierId}/detail`)
+    .then(res => res.json())
+    .then(data => {
+        farmerPreview.innerHTML = (data.photoUrl && data.photoUrl !== 'null')
+            ? `<img src="${data.photoUrl}" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">`
             : '<span class="text-muted small">No photo yet</span>';
 
-        const landPreview = document.getElementById('landPhotoPreview');
-        landPreview.innerHTML = (landPhotoUrl && landPhotoUrl !== 'null' && landPhotoUrl !== 'undefined')
-            ? `<img src="${landPhotoUrl}" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">`
+        landPreview.innerHTML = (data.landPhotoUrl && data.landPhotoUrl !== 'null')
+            ? `<img src="${data.landPhotoUrl}" style="width:100px;height:100px;object-fit:cover;border-radius:8px;">`
             : '<span class="text-muted small">No photo yet</span>';
+    })
+    .catch(() => {
+        farmerPreview.innerHTML = '<span class="text-muted small">Failed to load</span>';
+        landPreview.innerHTML = '<span class="text-muted small">Failed to load</span>';
+    });
 
         new bootstrap.Modal(document.getElementById('supplierModal')).show();
     }

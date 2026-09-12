@@ -715,19 +715,19 @@
                 </div>
                 <div class="card-body-pad">
                     <div class="grade-grid mb-5">
-                        <div class="grade-tile"><label>OP1</label><input type="number" step="0.01" name="op1" class="form-control target-qty" value="0"></div>
-                        <div class="grade-tile"><label>OPA</label><input type="number" step="0.01" name="opa" class="form-control target-qty" value="0"></div>
-                        <div class="grade-tile"><label>BOP1</label><input type="number" step="0.01" name="bop1" class="form-control target-qty" value="0"></div>
-                        <div class="grade-tile"><label>PEKOE</label><input type="number" step="0.01" name="pekoe" class="form-control target-qty" value="0"></div>
-                        <div class="grade-tile"><label>BOP</label><input type="number" step="0.01" name="bop" class="form-control target-qty" value="0"></div>
-                        <div class="grade-tile"><label>BOPF</label><input type="number" step="0.01" name="bopf" class="form-control target-qty" value="0"></div>
-                        <div class="grade-tile"><label>EB</label><input type="number" step="0.01" name="eb" class="form-control target-qty" value="0"></div>
-                        <div class="grade-tile"><label>FFSP</label><input type="number" step="0.01" name="ffsp" class="form-control target-qty" value="0"></div>
-                        <div class="grade-tile"><label>FFEXS</label><input type="number" step="0.01" name="ffexs" class="form-control target-qty" value="0"></div>
-                        <div class="grade-tile"><label>DUST</label><input type="number" step="0.01" name="dust" class="form-control target-qty" value="0"></div>
-                        <div class="grade-tile"><label>BM</label><input type="number" step="0.01" name="bm" class="form-control target-qty" value="0"></div>
-                        <div class="grade-tile"><label>BP</label><input type="number" step="0.01" name="bp" class="form-control target-qty" value="0"></div>
-                        <div class="grade-tile"><label>REFUSE</label><input type="number" step="0.01" name="refusedTea" class="form-control target-qty" value="0"></div>
+                        <div class="grade-tile"><label>OP1</label><input type="number" step="0.01" name="op1" class="form-control target-qty"></div>
+                        <div class="grade-tile"><label>OPA</label><input type="number" step="0.01" name="opa" class="form-control target-qty"></div>
+                        <div class="grade-tile"><label>BOP1</label><input type="number" step="0.01" name="bop1" class="form-control target-qty"></div>
+                        <div class="grade-tile"><label>PEKOE</label><input type="number" step="0.01" name="pekoe" class="form-control target-qty"></div>
+                        <div class="grade-tile"><label>BOP</label><input type="number" step="0.01" name="bop" class="form-control target-qty"></div>
+                        <div class="grade-tile"><label>BOPF</label><input type="number" step="0.01" name="bopf" class="form-control target-qty"></div>
+                        <div class="grade-tile"><label>EB</label><input type="number" step="0.01" name="eb" class="form-control target-qty"></div>
+                        <div class="grade-tile"><label>FFSP</label><input type="number" step="0.01" name="ffsp" class="form-control target-qty"></div>
+                        <div class="grade-tile"><label>FFEXS</label><input type="number" step="0.01" name="ffexs" class="form-control target-qty"></div>
+                        <div class="grade-tile"><label>DUST</label><input type="number" step="0.01" name="dust" class="form-control target-qty"></div>
+                        <div class="grade-tile"><label>BM</label><input type="number" step="0.01" name="bm" class="form-control target-qty"></div>
+                        <div class="grade-tile"><label>BP</label><input type="number" step="0.01" name="bp" class="form-control target-qty"></div>
+                        <div class="grade-tile"><label>REFUSE</label><input type="number" step="0.01" name="refusedTea" class="form-control target-qty"></div>
                     </div>
 
                     <!-- Balance Strip -->
@@ -961,7 +961,14 @@
 
     sourceInput.addEventListener('input', updateBalance);
     targetInputs.forEach(inp => inp.addEventListener('input', updateBalance));
-    updateBalance(); // run once on load so state is correct from the start
+        updateBalance(); // run once on load so state is correct from the start
+
+    document.addEventListener('wheel', function () {
+        if (document.activeElement && document.activeElement.type === 'number') {
+            document.activeElement.blur();
+        }
+    }, { passive: true });
+</script>
 </script>
 </body>
 </html>

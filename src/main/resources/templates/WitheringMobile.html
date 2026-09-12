@@ -68,11 +68,11 @@
                     <div th:each="b : ${batches}" class="form-check d-flex align-items-center gap-2 py-1 border-bottom" style="border-color: #f1f5f9 !important;">
                         <input class="form-check-input batch-checkbox" type="checkbox" name="batchIds"
                                th:id="'batch_' + ${b.batchId}" th:value="${b.batchId}"
-                               th:data-weight="${b.totalWeight}" th:disabled="${b.isProcessed}"
+                               th:data-weight="${b.totalWeight}"
                                onchange="updateIntakeWeight()" style="cursor: pointer; width: 1.2em; height: 1.2em;">
                         <label class="form-check-label w-100 mb-0 text-start" th:for="'batch_' + ${b.batchId}"
-                               th:style="${b.isProcessed} ? 'color: #a0aec0; text-decoration: line-through; font-style: italic;' : 'color: #2d3748; cursor: pointer; font-size: 0.9rem;'"
-                               th:text="${b.isProcessed} ? 'Batch ' + ${b.batchId} + ' - (Processed)' : 'Batch ' + ${b.batchId}">
+                               style="color: #2d3748; cursor: pointer; font-size: 0.9rem;"
+                               th:text="'Batch ' + ${b.batchId}">
                         </label>
                     </div>
                     <div th:if="${#lists.isEmpty(batches)}" class="text-muted small text-center py-2">

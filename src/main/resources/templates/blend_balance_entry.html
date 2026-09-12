@@ -101,7 +101,7 @@
                 <tbody>
                 <tr th:each="row : ${history}" class="ledger-row">
                     <td class="ref-cell fw-bold" th:text="${row.blendId}"></td>
-                    <td th:each="grade : ${ {'OP1','OPA','BOP1','PEKOE','BOP','BOPF','EB','FFSP','FFEXS','DUST','BM','BP','REFUSEDTEA'} }">
+                    <td th:each="grade : ${ {'OP1','OPA','BOP1','PEKOE','BOP','BOPF','EB','FFSP','FFEXS','DUST','BM','BP','REFUSE'} }">
                         <div class="fw-bold" th:text="${row.weights.get(grade) != null ? row.weights.get(grade) : '0.0'}"></div>
                         <div class="text-muted" style="font-size: 9px;" th:text="'Orig: ' + ${row.get(grade + '_orig') != null ? row.get(grade + '_orig') : '0.0'}"></div>
                     </td>
@@ -113,7 +113,7 @@
     </div>
 </div>
 
-<div class="history-section mt-5">
+<!--<div class="history-section mt-5">
     <div class="section-title">Recent Remnant Deductions (Audit Trail)</div>
     <div class="table-responsive">
         <table class="modern-table">
@@ -137,7 +137,7 @@
             </tbody>
         </table>
     </div>
-</div>
+</div>-->
 
 <script th:inline="javascript">
     const ledgerData = /*[[${history}]]*/ [];
@@ -162,7 +162,7 @@
        doc.setTextColor(63, 161, 122);
        doc.text("LUMILEAF - REMNANT AUDIT REPORT", 14, 15);
 
-       const grades = ['OP1','OPA','BOP1','PEKOE','BOP','BOPF','EB','FFSP','FFEXS','DUST','BM','BP','REFUSEDTEA'];
+       const grades = ['OP1','OPA','BOP1','PEKOE','BOP','BOPF','EB','FFSP','FFEXS','DUST','BM','BP','REFUSE'];
        const gradeHeaders = ['OP1','OPA','BOP1','PEKOE','BOP','BOPF','EB','FFSP','FFEXS','DUST','BM','BP','REFUSE'];
 
        const headRow = ['REFERENCE', ...gradeHeaders, 'LIVE TOTAL'];

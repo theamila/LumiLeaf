@@ -64,12 +64,14 @@ public class WitheringController {
         List<Map<String, Object>> arrivedBatches = new ArrayList<>();
         for (String fullBatchId : uniqueFullBatchIds) {
             // ── FIX 1 (continued): Look up weight by full ID, not stripped base key
+            if (processedBatchIds.contains(fullBatchId)) {
+                continue; // skip already-processed batches entirely — don't show them
+            }
             Double specificWeight = fullBatchWeightMap.getOrDefault(fullBatchId.trim(), 0.0);
 
             Map<String, Object> batchInfo = new HashMap<>();
             batchInfo.put("batchId", fullBatchId);
             batchInfo.put("totalWeight", specificWeight);
-            batchInfo.put("isProcessed", processedBatchIds.contains(fullBatchId));
             arrivedBatches.add(batchInfo);
         }
 
@@ -79,7 +81,7 @@ public class WitheringController {
         List<String> officerNames = Arrays.asList("Jagath");
         model.addAttribute("officers", officerNames);
 
-        model.addAttribute("witheringHistory", buildGroupedWitheringHistory());
+        model.addAttribute("witheringHistory", filterToLatestWeek(buildGroupedWitheringHistory()));
         model.addAttribute("witheringPoint", new WitheringPoint());
 
         return "WitheringMobile";
@@ -280,6 +282,47 @@ public class WitheringController {
         return "redirect:/mobile/withering_dashboard?success";
     }
 
+    /**
+     * Keeps only the groups belonging to the most recent production week.
+     * A group whose week number can't be parsed is always kept (safe default).
+     * Used only for the mobile officer-facing History tab — QA/production
+     * views call buildGroupedWitheringHistory() directly and see everything.
+     */
+    private List<Map<String, Object>> filterToLatestWeek(List<Map<String, Object>> groups) {
+        Integer maxWeek = null;
+        for (Map<String, Object> group : groups) {
+            Integer week = parseWeekNumber((String) group.get("productionBatchNo"));
+            if (week != null && (maxWeek == null || week > maxWeek)) {
+                maxWeek = week;
+            }
+        }
+
+        if (maxWeek == null) {
+            return groups;
+        }
+
+        final Integer finalMaxWeek = maxWeek;
+        return groups.stream()
+                .filter(g -> {
+                    Integer week = parseWeekNumber((String) g.get("productionBatchNo"));
+                    return week == null || week.equals(finalMaxWeek);
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Extracts the week number from the first segment of a production batch
+     * number like "120/1/AM" -> 120. Returns null if it can't be parsed.
+     */
+    private Integer parseWeekNumber(String productionBatchNo) {
+        if (productionBatchNo == null || productionBatchNo.isBlank()) return null;
+        String firstSegment = productionBatchNo.split("/")[0].trim();
+        try {
+            return Integer.parseInt(firstSegment);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
     /**
      * FIX 2: Matches WaitingPoint records by FULL batch ID (e.g. "113 ( ESTATE )").
      *
