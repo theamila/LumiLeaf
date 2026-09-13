@@ -44,6 +44,7 @@ public class SecurityConfig {
                                 "/", "/index", "/login", "/trace/**",
                                 "/manifest.json", "/sw.js",
                                 "/icons/**", "/css/**", "/js/**", "/images/**", "/uploads/**", "/static/**",
+                                "/login-bg.png", "/lumbini_logo.png",
                                 "/api/supplier/*/detail", "/api/production/*/contributions"
                         ).permitAll()
                         .anyRequest().authenticated()

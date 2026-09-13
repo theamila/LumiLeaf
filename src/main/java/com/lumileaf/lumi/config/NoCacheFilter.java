@@ -22,7 +22,9 @@ public class NoCacheFilter implements Filter {
                 || path.startsWith("/css/")
                 || path.startsWith("/js/")
                 || path.startsWith("/lumbini_logo.png")
-                || path.startsWith("/style.css");
+                || path.startsWith("/style.css")
+                || path.startsWith("/login-bg.png");
+
 
         if (!isPublic) {
             response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
