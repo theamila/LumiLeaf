@@ -137,6 +137,9 @@ public class ProductionBatch {
     @Column(name = "ffexs")
     private Double ffexs = 0.0;
 
+    @Column(name = "bop1a")
+    private Double bop1a =0.0;
+
     @Column(name = "dust")
     private Double dust = 0.0;
 
@@ -265,6 +268,9 @@ public class ProductionBatch {
 
     public Double getFfexs() { return ffexs; }
     public void setFfexs(Double ffexs) { this.ffexs = ffexs; }
+
+    public Double getBop1A() { return bop1a; }
+    public void setBop1A(Double bop1A) { this.bop1a = bop1A; }
 
     public Double getDust() { return dust; }
     public void setDust(Double dust) { this.dust = dust; }

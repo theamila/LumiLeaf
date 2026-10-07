@@ -130,18 +130,47 @@
                     <!-- 3. Grade Breakdown & Remarks Row -->
                     <td class="ps-4">
                         <div class="text-muted small font-monospace">
-                            <span th:if="${stock.op1 > 0}" th:text="'OP1: ' + ${stock.op1} + ' | '"></span>
-                            <span th:if="${stock.opa > 0}" th:text="'OPA: ' + ${stock.opa} + ' | '"></span>
-                            <span th:if="${stock.bop1 > 0}" th:text="'BOP1: ' + ${stock.bop1} + ' | '"></span>
-                            <span th:if="${stock.pekoe > 0}" th:text="'PEKOE: ' + ${stock.pekoe} + ' | '"></span>
-                            <span th:if="${stock.bop > 0}" th:text="'BOP: ' + ${stock.bop} + ' | '"></span>
-                            <span th:if="${stock.bopf > 0}" th:text="'BOPF: ' + ${stock.bopf} + ' | '"></span>
-                            <span th:if="${stock.eb > 0}" th:text="'EB: ' + ${stock.eb} + ' | '"></span>
-                            <span th:if="${stock.ffsp > 0}" th:text="'FFSP: ' + ${stock.ffsp} + ' | '"></span>
-                            <span th:if="${stock.ffexs > 0}" th:text="'FFEXS: ' + ${stock.ffexs} + ' | '"></span>
-                            <span th:if="${stock.dust > 0}" th:text="'DUST: ' + ${stock.dust} + ' | '"></span>
-                            <span th:if="${stock.bm > 0}" th:text="'BM: ' + ${stock.bm} + ' | '"></span>
-                            <span th:if="${stock.bp > 0}" th:text="'BP: ' + ${stock.bp} + ' | '"></span>
+                            <span th:if="${stock.op1 > 0}" th:with="pct=${stock.total != null and stock.total > 0 ? (stock.op1 / stock.total * 100) : 0}">
+                                <span th:text="'OP1: ' + ${stock.op1} + ' ('"></span><span th:text="${#numbers.formatDecimal(pct,1,1)} + '%'" th:classappend="${pct >= 3 and pct <= 4} ? '' : 'text-danger fw-bold'"></span><span th:text="') | '"></span>
+                            </span>
+                            <span th:if="${stock.opa > 0}" th:with="pct=${stock.total != null and stock.total > 0 ? (stock.opa / stock.total * 100) : 0}">
+                                <span th:text="'OPA: ' + ${stock.opa} + ' ('"></span><span th:text="${#numbers.formatDecimal(pct,1,1)} + '%'" th:classappend="${pct >= 16 and pct <= 20} ? '' : 'text-danger fw-bold'"></span><span th:text="') | '"></span>
+                            </span>
+                            <span th:if="${stock.bop1 > 0}" th:with="pct=${stock.total != null and stock.total > 0 ? (stock.bop1 / stock.total * 100) : 0}">
+                                <span th:text="'BOP1: ' + ${stock.bop1} + ' ('"></span><span th:text="${#numbers.formatDecimal(pct,1,1)} + '%'" th:classappend="${pct >= 11 and pct <= 13} ? '' : 'text-danger fw-bold'"></span><span th:text="') | '"></span>
+                            </span>
+                            <span th:if="${stock.pekoe > 0}" th:with="pct=${stock.total != null and stock.total > 0 ? (stock.pekoe / stock.total * 100) : 0}">
+                                <span th:text="'PEKOE: ' + ${stock.pekoe} + ' ('"></span><span th:text="${#numbers.formatDecimal(pct,1,1)} + '%'" th:classappend="${pct >= 12 and pct <= 16} ? '' : 'text-danger fw-bold'"></span><span th:text="') | '"></span>
+                            </span>
+                            <span th:if="${stock.bop > 0}" th:with="pct=${stock.total != null and stock.total > 0 ? (stock.bop / stock.total * 100) : 0}">
+                                <span th:text="'BOP: ' + ${stock.bop} + ' ('"></span><span th:text="${#numbers.formatDecimal(pct,1,1)} + '%'" th:classappend="${pct >= 7 and pct <= 9} ? '' : 'text-danger fw-bold'"></span><span th:text="') | '"></span>
+                            </span>
+                            <span th:if="${stock.bopf > 0}" th:with="pct=${stock.total != null and stock.total > 0 ? (stock.bopf / stock.total * 100) : 0}">
+                                <span th:text="'BOPF: ' + ${stock.bopf} + ' ('"></span><span th:text="${#numbers.formatDecimal(pct,1,1)} + '%'" th:classappend="${pct >= 3 and pct <= 5} ? '' : 'text-danger fw-bold'"></span><span th:text="') | '"></span>
+                            </span>
+                            <span th:if="${stock.eb > 0}" th:with="pct=${stock.total != null and stock.total > 0 ? (stock.eb / stock.total * 100) : 0}">
+                                <span th:text="'EB: ' + ${stock.eb} + ' ('"></span><span th:text="${#numbers.formatDecimal(pct,1,1)} + '%'" th:classappend="${pct >= 10 and pct <= 16} ? '' : 'text-danger fw-bold'"></span><span th:text="') | '"></span>
+                            </span>
+                            <span th:if="${stock.ffsp > 0}" th:with="pct=${stock.total != null and stock.total > 0 ? (stock.ffsp / stock.total * 100) : 0}">
+                                <span th:text="'FFSP: ' + ${stock.ffsp} + ' ('"></span><span th:text="${#numbers.formatDecimal(pct,1,1)} + '%'" th:classappend="${pct >= 0 and pct <= 2} ? '' : 'text-danger fw-bold'"></span><span th:text="') | '"></span>
+                            </span>
+                            <span th:if="${stock.ffexs > 0}" th:with="pct=${stock.total != null and stock.total > 0 ? (stock.ffexs / stock.total * 100) : 0}">
+                                <span th:text="'FFEXS: ' + ${stock.ffexs} + ' ('"></span><span th:text="${#numbers.formatDecimal(pct,1,1)} + '%'" th:classappend="${pct >= 0 and pct <= 1} ? '' : 'text-danger fw-bold'"></span><span th:text="') | '"></span>
+                            </span>
+
+
+                            <span th:if="${stock.bop1A > 0}" th:with="pct=${stock.total != null and stock.total > 0 ? (stock.bop1A / stock.total * 100) : 0}">
+                            <span th:text="'BOP1A: ' + ${stock.bop1A} + ' ('"></span><span th:text="${#numbers.formatDecimal(pct,1,1)} + '%'"></span><span th:text="') | '"></span>
+                            </span>
+                            <span th:if="${stock.dust > 0}" th:with="pct=${stock.total != null and stock.total > 0 ? (stock.dust / stock.total * 100) : 0}">
+                                <span th:text="'DUST: ' + ${stock.dust} + ' ('"></span><span th:text="${#numbers.formatDecimal(pct,1,1)} + '%'" th:classappend="${pct >= 4 and pct <= 9} ? '' : 'text-danger fw-bold'"></span><span th:text="') | '"></span>
+                            </span>
+                            <span th:if="${stock.bm > 0}" th:with="pct=${stock.total != null and stock.total > 0 ? (stock.bm / stock.total * 100) : 0}">
+                                <span th:text="'BM: ' + ${stock.bm} + ' ('"></span><span th:text="${#numbers.formatDecimal(pct,1,1)} + '%'" th:classappend="${pct >= 0 and pct <= 2} ? '' : 'text-danger fw-bold'"></span><span th:text="') | '"></span>
+                            </span>
+                            <span th:if="${stock.bp > 0}" th:with="pct=${stock.total != null and stock.total > 0 ? (stock.bp / stock.total * 100) : 0}">
+                                <span th:text="'BP: ' + ${stock.bp} + ' ('"></span><span th:text="${#numbers.formatDecimal(pct,1,1)} + '%'" th:classappend="${pct >= 0 and pct <= 6} ? '' : 'text-danger fw-bold'"></span><span th:text="') | '"></span>
+                            </span>
                         </div>
                         <div th:if="${stock.status == 'REJECTED' && stock.rejectNote != null}" class="text-danger small mt-1">
                             <i class="fas fa-exclamation-circle me-1"></i><strong>Remark:</strong> <span th:text="${stock.rejectNote}">Reason</span>
@@ -222,8 +251,10 @@
                                         th:data-op1="${stock.op1}" th:data-opa="${stock.opa}" th:data-bop1="${stock.bop1}"
                                         th:data-pekoe="${stock.pekoe}" th:data-bop="${stock.bop}" th:data-bopf="${stock.bopf}"
                                         th:data-eb="${stock.eb}" th:data-ffsp="${stock.ffsp}" th:data-ffexs="${stock.ffexs}"
+                                        th:data-bop1a="${stock.bop1A}"
                                         th:data-dust="${stock.dust}" th:data-bm="${stock.bm}" th:data-bp="${stock.bp}"
                                         th:data-refused="${stock.refusedTea}"
+                                        th:data-total="${stock.total}"
                                         th:data-not-tested="${stock.notTestedQty}"
                                         th:data-tested="${stock.testedQty}"
                                         onclick="openEditStockModal(this)">
@@ -263,55 +294,72 @@
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-muted">OP1</label>
-                            <input type="number" step="0.01" class="form-control" name="op1" id="editOp1">
+                            <input type="number" step="0.01" class="form-control" name="op1" id="editOp1" oninput="recalcModalPercentages()">
+                            <small id="pctOp1" class="text-muted"></small>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-muted">OPA</label>
-                            <input type="number" step="0.01" class="form-control" name="opa" id="editOpa">
+                            <input type="number" step="0.01" class="form-control" name="opa" id="editOpa" oninput="recalcModalPercentages()">
+                            <small id="pctOpa" class="text-muted"></small>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-muted">BOP1</label>
-                            <input type="number" step="0.01" class="form-control" name="bop1" id="editBop1">
+                            <input type="number" step="0.01" class="form-control" name="bop1" id="editBop1" oninput="recalcModalPercentages()">
+                            <small id="pctBop1" class="text-muted"></small>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-muted">PEKOE</label>
-                            <input type="number" step="0.01" class="form-control" name="pekoe" id="editPekoe">
+                            <input type="number" step="0.01" class="form-control" name="pekoe" id="editPekoe" oninput="recalcModalPercentages()">
+                            <small id="pctPekoe" class="text-muted"></small>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-muted">BOP</label>
-                            <input type="number" step="0.01" class="form-control" name="bop" id="editBop">
+                            <input type="number" step="0.01" class="form-control" name="bop" id="editBop" oninput="recalcModalPercentages()">
+                            <small id="pctBop" class="text-muted"></small>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-muted">BOPF</label>
-                            <input type="number" step="0.01" class="form-control" name="bopf" id="editBopf">
+                            <input type="number" step="0.01" class="form-control" name="bopf" id="editBopf" oninput="recalcModalPercentages()">
+                            <small id="pctBopf" class="text-muted"></small>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-muted">EB</label>
-                            <input type="number" step="0.01" class="form-control" name="eb" id="editEb">
+                            <input type="number" step="0.01" class="form-control" name="eb" id="editEb" oninput="recalcModalPercentages()">
+                            <small id="pctEb" class="text-muted"></small>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-muted">FFSP</label>
-                            <input type="number" step="0.01" class="form-control" name="ffsp" id="editFfsp">
+                            <input type="number" step="0.01" class="form-control" name="ffsp" id="editFfsp" oninput="recalcModalPercentages()">
+                            <small id="pctFfsp" class="text-muted"></small>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-muted">FFEXS</label>
-                            <input type="number" step="0.01" class="form-control" name="ffexs" id="editFfexs">
+                            <input type="number" step="0.01" class="form-control" name="ffexs" id="editFfexs" oninput="recalcModalPercentages()">
+                            <small id="pctFfexs" class="text-muted"></small>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted">BOP1A</label>
+                            <input type="number" step="0.01" class="form-control" name="bop1A" id="editBop1a" oninput="recalcModalPercentages()">
+                            <small id="pctBop1a" class="text-muted"></small>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-muted">DUST</label>
-                            <input type="number" step="0.01" class="form-control" name="dust" id="editDust">
+                            <input type="number" step="0.01" class="form-control" name="dust" id="editDust" oninput="recalcModalPercentages()">
+                            <small id="pctDust" class="text-muted"></small>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-muted">BM</label>
-                            <input type="number" step="0.01" class="form-control" name="bm" id="editBm">
+                            <input type="number" step="0.01" class="form-control" name="bm" id="editBm" oninput="recalcModalPercentages()">
+                            <small id="pctBm" class="text-muted"></small>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-muted">BP</label>
-                            <input type="number" step="0.01" class="form-control" name="bp" id="editBp">
+                            <input type="number" step="0.01" class="form-control" name="bp" id="editBp" oninput="recalcModalPercentages()">
+                            <small id="pctBp" class="text-muted"></small>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-muted">Refuse Tea</label>
-                            <input type="number" step="0.01" class="form-control" name="refusedTea" id="editRefused">
+                            <input type="number" step="0.01" class="form-control" name="refusedTea" id="editRefused" oninput="recalcModalPercentages()">
                         </div>
                         <!-- ✅ FIX #3: Not Tested field moved INSIDE modal-body and row grid -->
                         <div class="col-md-3">
@@ -347,9 +395,58 @@
         return (val === "0.0" || val === "0" || val == null || val === "") ? '' : val;
     }
 
+    const GRADE_RANGES = {
+        op1: [3, 4], opa: [16, 20], bop1: [11, 13], pekoe: [12, 16],
+        bop: [7, 9], bopf: [3, 5], eb: [10, 16], ffsp: [0, 2],
+        ffexs: [0, 1], bop1a: [10, 20], dust: [4, 9], bm: [0, 2], bp: [0, 6]
+    };
+    let modalExisting = {};
+
+    function recalcModalPercentages() {
+        const keys = Object.keys(GRADE_RANGES);
+        let sumNew = 0;
+        keys.forEach(k => sumNew += (parseFloat(document.getElementById('edit' + capitalize(k)).value) || 0));
+        sumNew += (parseFloat(document.getElementById('editRefused').value) || 0);
+
+        const projectedTotal = (modalExisting.total || 0) + sumNew;
+
+        keys.forEach(k => {
+            const newVal = parseFloat(document.getElementById('edit' + capitalize(k)).value) || 0;
+            const projectedAmt = (modalExisting[k] || 0) + newVal;
+            const pct = projectedTotal > 0 ? (projectedAmt / projectedTotal * 100) : 0;
+            const [min, max] = GRADE_RANGES[k];
+            const el = document.getElementById('pct' + capitalize(k));
+            if(el) {
+                el.textContent = pct.toFixed(1) + '%';
+                el.className = (pct >= min && pct <= max) ? 'text-success' : 'text-danger fw-bold';
+            }
+        });
+    }
+
+    function capitalize(s) {
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
     function openEditStockModal(button) {
         document.getElementById('editId').value = button.getAttribute('data-id');
         document.getElementById('modalLotTitle').innerText = button.getAttribute('data-lot');
+
+        modalExisting = {
+            op1: parseFloat(button.getAttribute('data-op1')) || 0,
+            opa: parseFloat(button.getAttribute('data-opa')) || 0,
+            bop1: parseFloat(button.getAttribute('data-bop1')) || 0,
+            pekoe: parseFloat(button.getAttribute('data-pekoe')) || 0,
+            bop: parseFloat(button.getAttribute('data-bop')) || 0,
+            bopf: parseFloat(button.getAttribute('data-bopf')) || 0,
+            eb: parseFloat(button.getAttribute('data-eb')) || 0,
+            ffsp: parseFloat(button.getAttribute('data-ffsp')) || 0,
+            ffexs: parseFloat(button.getAttribute('data-ffexs')) || 0,
+            bop1a: parseFloat(button.getAttribute('data-bop1a')) || 0,
+            dust: parseFloat(button.getAttribute('data-dust')) || 0,
+            bm: parseFloat(button.getAttribute('data-bm')) || 0,
+            bp: parseFloat(button.getAttribute('data-bp')) || 0,
+            total: parseFloat(button.getAttribute('data-total')) || 0
+        };
 
         // FIX (Issue 3 follow-up): grade fields are now ADDITIVE on the backend
         // (editStockProduction() adds submitted amounts on top of existing stock).
@@ -366,6 +463,7 @@
         document.getElementById('editEb').value = '';
         document.getElementById('editFfsp').value = '';
         document.getElementById('editFfexs').value = '';
+       document.getElementById('editBop1a').value = '';
         document.getElementById('editDust').value = '';
         document.getElementById('editBm').value = '';
         document.getElementById('editBp').value = '';
@@ -375,6 +473,8 @@
         // before) — these keep pre-filling with the lot's actual current values.
         document.getElementById('editNotTested').value = clearIfZero(button.getAttribute('data-not-tested'));
         document.getElementById('editTested').value = clearIfZero(button.getAttribute('data-tested'));
+
+        recalcModalPercentages();
 
         var editModal = new bootstrap.Modal(document.getElementById('editStockModal'));
         editModal.show();

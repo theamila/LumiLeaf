@@ -29,6 +29,9 @@ import com.lumileaf.lumi.model.Buyer;
 import com.lumileaf.lumi.repository.BuyerRepository;
 import com.lumileaf.lumi.model.GradeTransaction;
 import com.lumileaf.lumi.repository.GradeTransactionRepository;
+import com.lumileaf.lumi.model.Admin;
+import com.lumileaf.lumi.repository.AdminRepository;
+import com.lumileaf.lumi.service.PermissionService;
 
 
 @Controller
@@ -42,6 +45,8 @@ public class BlendingController {
     @Autowired private ContributionService contributionService;
     @Autowired private BuyerRepository buyerRepo;
     @Autowired private GradeTransactionRepository txRepo;
+    @Autowired private AdminRepository adminRepo;
+    @Autowired private PermissionService permissionService;
     private Map<String, List<Blending>> buildGroupedBlends() {
         return blendingRepo.findAll().stream()
                 .collect(Collectors.groupingBy(Blending::getInvoiceNumber));
@@ -75,7 +80,7 @@ public class BlendingController {
     @GetMapping("/blending/api/stock-summary")
     @ResponseBody
     public Map<String, Double> getStockSummary() {
-        String[] allGrades = {"OP1", "OPA", "BOP1", "PEKOE", "BOP", "BOPF", "EB", "FFSP", "FFEXS", "DUST", "BM", "BP", "REFUSE"};
+        String[] allGrades = {"OP1", "OPA", "BOP1", "PEKOE", "BOP", "BOPF", "EB", "FFSP", "FFEXS", "BOP1A", "DUST", "BM", "BP", "REFUSE"};
         Map<String, Double> summary = new HashMap<>();
         List<Blending> allBlends = blendingRepo.findAll();
 
@@ -125,6 +130,7 @@ public class BlendingController {
                 case "EB" -> tx.getEb();
                 case "FFSP" -> tx.getFfsp();
                 case "FFEXS" -> tx.getFfexs();
+                case "BOP1A" -> tx.getBop1A();
                 case "DUST" -> tx.getDust();
                 case "BM" -> tx.getBm();
                 case "BP" -> tx.getBp();
@@ -267,7 +273,13 @@ public class BlendingController {
 
     @PostMapping("/blending/save")
     @Transactional
-    public String saveBlending(@ModelAttribute("newBlend") Blending blending, RedirectAttributes ra) {
+    public String saveBlending(@ModelAttribute("newBlend") Blending blending, HttpSession session, RedirectAttributes ra) {
+        String username = (String) session.getAttribute("username");
+        Admin admin = (username != null) ? adminRepo.findByUsername(username) : null;
+        if (admin == null || !permissionService.hasPermission(admin, "QA_MAKE_BLENDING")) {
+            ra.addFlashAttribute("error", "You don't have permission to make blending entries.");
+            return "redirect:/blending";
+        }
         if (blending.getGrade() != null) blending.setGrade(blending.getGrade().trim().toUpperCase());
 
         // ✅ FIX Issue 2: Check for duplicate FG number across all invoices
@@ -380,6 +392,7 @@ public class BlendingController {
             case "EB"     -> balance.getEb();
             case "FFSP"   -> balance.getFfsp();
             case "FFEXS"  -> balance.getFfexs();
+            case "BOP1A"  -> balance.getBop1A();
             case "DUST"   -> balance.getDust();
             case "BM"     -> balance.getBm();
             case "BP"     -> balance.getBp();
@@ -401,6 +414,7 @@ public class BlendingController {
             case "EB" -> batch.getEb();
             case "FFSP" -> batch.getFfsp();
             case "FFEXS" -> batch.getFfexs();
+            case "BOP1A" -> batch.getBop1A();
             case "DUST" -> batch.getDust();
             case "BM" -> batch.getBm();
             case "BP" -> batch.getBp();
@@ -424,6 +438,7 @@ public class BlendingController {
             case "EB" -> sp.getEb();
             case "FFSP" -> sp.getFfsp();
             case "FFEXS" -> sp.getFfexs();
+            case "BOP1A" -> sp.getBop1A();
             case "DUST" -> sp.getDust();
             case "BM" -> sp.getBm();
             case "BP" -> sp.getBp();
@@ -473,7 +488,13 @@ public class BlendingController {
         return "redirect:/blending";
     }
     @GetMapping("/blending/dispatch-note/{id}")
-    public String showDispatchNote(@PathVariable Long id, Model model) {
+    public String showDispatchNote(@PathVariable Long id, HttpSession session, RedirectAttributes ra, Model model) {
+        String username = (String) session.getAttribute("username");
+        Admin admin = (username != null) ? adminRepo.findByUsername(username) : null;
+        if (admin == null || !permissionService.hasPermission(admin, "QA_GENERATE_QR")) {
+            ra.addFlashAttribute("error", "You don't have permission to generate QR codes / dispatch notes.");
+            return "redirect:/blending";
+        }
         Blending blend = blendingRepo.findById(id).orElseThrow();
 
         // Default 10kg-increment package split — user can adjust in the template before printing.
@@ -499,7 +520,13 @@ public class BlendingController {
     }
 
     @GetMapping("/blending/label/{id}")
-    public String showQrLabel(@PathVariable Long id, Model model) {
+    public String showQrLabel(@PathVariable Long id, HttpSession session, RedirectAttributes ra, Model model) {
+        String username = (String) session.getAttribute("username");
+        Admin admin = (username != null) ? adminRepo.findByUsername(username) : null;
+        if (admin == null || !permissionService.hasPermission(admin, "QA_GENERATE_QR")) {
+            ra.addFlashAttribute("error", "You don't have permission to generate QR codes / dispatch notes.");
+            return "redirect:/blending";
+        }
         Blending blend = blendingRepo.findById(id).orElseThrow();
         String ipAddress;
         try { ipAddress = InetAddress.getLocalHost().getHostAddress(); }

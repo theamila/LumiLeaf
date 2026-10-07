@@ -19,12 +19,20 @@ import java.util.stream.Collectors;
 import com.lumileaf.lumi.model.NotificationEvent;
 import com.lumileaf.lumi.repository.NotificationEventRepository;
 import com.lumileaf.lumi.util.BatchIdUtils;
+import com.lumileaf.lumi.model.Admin;
+import com.lumileaf.lumi.repository.AdminRepository;
+import com.lumileaf.lumi.service.PermissionService;
 
 @Controller
 public class WitheringController {
 
     @Autowired private WitheringPointRepository witheringRepo;
     @Autowired private WaitingPointRepository waitingRepo;
+    @Autowired
+    private AdminRepository adminRepo;
+
+    @Autowired
+    private PermissionService permissionService;
     @Autowired
     private NotificationEventRepository notificationRepo;
 
@@ -132,6 +140,11 @@ public class WitheringController {
 
         String username = (String) session.getAttribute("username");
         if (username == null) return "redirect:/login";
+        Admin admin = adminRepo.findByUsername(username);
+        if (admin == null || !permissionService.hasPermission(admin, "WITHERING_SAVE")) {
+            ra.addFlashAttribute("error", "You don't have permission to save withering records.");
+            return "redirect:/mobile/withering_dashboard";
+        }
 
         // Fallback handle to support single-item form submission profiles safely
         List<String> finalBatchIds = batchIds;

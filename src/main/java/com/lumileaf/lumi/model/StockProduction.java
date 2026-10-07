@@ -26,6 +26,7 @@ public class StockProduction {
     private Double eb = 0.0;
     private Double ffsp = 0.0;
     private Double ffexs = 0.0;
+    private Double bop1A = 0.0;
     private Double dust = 0.0;
     private Double bm = 0.0;
     private Double bp = 0.0;
@@ -138,6 +139,9 @@ public class StockProduction {
 
     public Double getFfexs() { return ffexs; }
     public void setFfexs(Double ffexs) { this.ffexs = ffexs; }
+
+    public Double getBop1A() { return bop1A; }
+    public void setBop1A(Double bop1A) { this.bop1A = bop1A; }
 
     public Double getDust() { return dust; }
     public void setDust(Double dust) { this.dust = dust; }

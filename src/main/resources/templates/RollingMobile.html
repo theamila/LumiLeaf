@@ -517,10 +517,24 @@
             <span class="brand-sub">Processing</span>
         </div>
     </div>
+    <div th:if="${session.impersonating}"
+         style="background-color:#fef3ec; color:#9c3e10; border-bottom:1px solid rgba(231,111,46,.2);
+            display:flex; justify-content:space-between; align-items:center;
+            padding:10px 16px; font-size:13px; font-weight:600;">
+        <span><i class="fas fa-user-shield" style="margin-right:6px;"></i>Viewing as Rolling Officer (Super Admin)</span>
+        <a th:href="@{/superadmin/exit-impersonation}"
+           style="background-color:#9c3e10; color:#fff; padding:5px 12px; border-radius:8px; text-decoration:none; font-size:12px;">
+            <i class="fas fa-arrow-left" style="margin-right:4px;"></i>Exit
+        </a>
+    </div>
     <div class="logout-btn" onclick="logout()">
         <i class="fas fa-power-off"></i>
     </div>
     <form id="logoutForm" th:action="@{/logout}" method="post"></form>
+</div>
+<div th:if="${error}" class="error-banner" style="margin:14px 16px 0;">
+    <i class="fas fa-exclamation-circle"></i>
+    <span th:text="${error}"></span>
 </div>
 
 

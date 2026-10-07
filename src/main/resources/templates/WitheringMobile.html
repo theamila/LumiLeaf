@@ -40,6 +40,14 @@
     </div>
     <a href="/logout" class="text-white"><i class="bi bi-power"></i></a>
 </div>
+<div th:if="${session.impersonating}"
+     class="d-flex justify-content-between align-items-center px-3 py-2"
+     style="background-color: #fef3c7; color: #92400e; font-size: 0.8rem; font-weight: 600;">
+    <span><i class="bi bi-person-badge-fill me-2"></i>Viewing as Withering Officer (Super Admin)</span>
+    <a th:href="@{/superadmin/exit-impersonation}" class="btn btn-sm" style="background-color:#92400e; color:#fff; border-radius:6px;">
+        <i class="bi bi-box-arrow-left me-1"></i> Exit
+    </a>
+</div>
 
 <div id="addContainer" class="tab-content-view">
     <div class="form-wrapper shadow-sm">

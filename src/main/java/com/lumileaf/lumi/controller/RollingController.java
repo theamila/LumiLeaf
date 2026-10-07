@@ -12,6 +12,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.lumileaf.lumi.model.Admin;
+import com.lumileaf.lumi.repository.AdminRepository;
+import com.lumileaf.lumi.service.PermissionService;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -28,6 +31,11 @@ public class RollingController {
     @Autowired private ProductionBatchRepository productionRepo;
     @Autowired
     private NotificationEventRepository notificationRepo;
+    @Autowired
+    private AdminRepository adminRepo;
+
+    @Autowired
+    private PermissionService permissionService;
 
     @GetMapping(value = "/mobile/rolling_dashboard")
     public String showRollingDashboard(@RequestParam(value = "date", required = false) String dateStr,
@@ -120,6 +128,11 @@ public class RollingController {
 
         String username = (String) session.getAttribute("username");
         if (username == null) return "redirect:/login";
+        Admin admin = adminRepo.findByUsername(username);
+        if (admin == null || !permissionService.hasPermission(admin, "ROLLING_SAVE")) {
+            ra.addFlashAttribute("error", "You don't have permission to save rolling records.");
+            return "redirect:/mobile/rolling_dashboard?date=" + LocalDate.now();
+        }
 
         String batchId = allParams.get("batchId");
         String dateStr = allParams.get("selectedDate");
@@ -221,6 +234,11 @@ public class RollingController {
                                      RedirectAttributes ra) {
         String username = (String) session.getAttribute("username");
         if (username == null) return "redirect:/login";
+        Admin admin = adminRepo.findByUsername(username);
+        if (admin == null || !permissionService.hasPermission(admin, "DRYING_UPDATE")) {
+            ra.addFlashAttribute("error", "You don't have permission to update drying records.");
+            return "redirect:/mobile/rolling_dashboard?date=" + allParams.get("redirectDate");
+        }
 
         String idStr = allParams.get("id");
         String redirectDate = allParams.get("redirectDate");

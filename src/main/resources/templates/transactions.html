@@ -610,7 +610,7 @@
 
     <!-- ══ TAB: New Transaction ══ -->
     <div class="tab-panel active" id="tab-form">
-        <form action="/qa/save-transaction" method="POST" id="txForm">
+        <form th:action="@{/qa/save-transaction}" method="POST" id="txForm">
 
             <!-- Officer Assignment Card -->
             <div class="card-panel mb-4">
@@ -669,6 +669,7 @@
                                 <option value="EB">EB — Electrostatic Broken</option>
                                 <option value="FFSP">FFSP</option>
                                 <option value="FFEXS">FFEXS</option>
+                                <option value="BOP1A">BOP1A — Broken OP 1 A</option>
                                 <option value="DUST">DUST</option>
                                 <option value="BM">BM — Broken Mixed</option>
                                 <option value="BP">BP — Broken Pekoe</option>
@@ -724,6 +725,7 @@
                         <div class="grade-tile"><label>EB</label><input type="number" step="0.01" name="eb" class="form-control target-qty"></div>
                         <div class="grade-tile"><label>FFSP</label><input type="number" step="0.01" name="ffsp" class="form-control target-qty"></div>
                         <div class="grade-tile"><label>FFEXS</label><input type="number" step="0.01" name="ffexs" class="form-control target-qty"></div>
+                        <div class="grade-tile"><label>BOP1A</label><input type="number" step="0.01" name="bop1a" class="form-control target-qty"></div>
                         <div class="grade-tile"><label>DUST</label><input type="number" step="0.01" name="dust" class="form-control target-qty"></div>
                         <div class="grade-tile"><label>BM</label><input type="number" step="0.01" name="bm" class="form-control target-qty"></div>
                         <div class="grade-tile"><label>BP</label><input type="number" step="0.01" name="bp" class="form-control target-qty"></div>
@@ -786,7 +788,7 @@
                     <tbody>
                     <!-- Thymeleaf rows -->
                     <tr th:each="tx : ${transactions}"
-                        th:with="totalDist=${(tx.op1 ?: 0) + (tx.opa ?: 0) + (tx.bop1 ?: 0) + (tx.pekoe ?: 0) + (tx.bop ?: 0) + (tx.bopf ?: 0) + (tx.eb ?: 0) + (tx.ffsp ?: 0) + (tx.ffexs ?: 0) + (tx.dust ?: 0) + (tx.bm ?: 0) + (tx.bp ?: 0) + (tx.refusedTea ?: 0)},
+                        th:with="totalDist=${(tx.op1 ?: 0) + (tx.opa ?: 0) + (tx.bop1 ?: 0) + (tx.pekoe ?: 0) + (tx.bop ?: 0) + (tx.bopf ?: 0) + (tx.eb ?: 0) + (tx.ffsp ?: 0) + (tx.ffexs ?: 0) + (tx.bop1A ?: 0) + (tx.dust ?: 0) + (tx.bm ?: 0) + (tx.bp ?: 0) + (tx.refusedTea ?: 0)},
                             diff=${(tx.sourceQty ?: 0) - totalDist}">
                         <td>
                             <div class="timestamp-main" th:text="${tx.date}">12 Jun 2025</div>
@@ -813,6 +815,7 @@
                                 <span th:if="${tx.eb > 0}" class="dist-badge" th:text="'EB +' + ${tx.eb}"></span>
                                 <span th:if="${tx.ffsp > 0}" class="dist-badge" th:text="'FFSP +' + ${tx.ffsp}"></span>
                                 <span th:if="${tx.ffexs > 0}" class="dist-badge" th:text="'FFEXS +' + ${tx.ffexs}"></span>
+                                <span th:if="${tx.bop1A != null and tx.bop1A > 0}" class="dist-badge" th:text="'BOP1A +' + ${tx.bop1A}"></span>
                                 <span th:if="${tx.dust > 0}" class="dist-badge" th:text="'DUST +' + ${tx.dust}"></span>
                                 <span th:if="${tx.bm > 0}" class="dist-badge" th:text="'BM +' + ${tx.bm}"></span>
                                 <span th:if="${tx.bp > 0}" class="dist-badge" th:text="'BP +' + ${tx.bp}"></span>
