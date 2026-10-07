@@ -66,6 +66,31 @@
             align-items: center;
             gap: 15px;
         }
+        .impersonation-banner {
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    height: 36px;
+    background: #fef3c7;
+    color: #92400e;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    font-size: 13px;
+    font-weight: 700;
+}
+.impersonation-banner a {
+    background: #92400e;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 12px;
+}
+body.impersonating-mode .navbar { top: 36px; }
+body.impersonating-mode .sidebar { top: 106px; height: calc(100vh - 106px); }
+body.impersonating-mode .main { margin-top: 106px; }
 
         .icon-btn {
             width: 40px;
@@ -304,7 +329,11 @@
     <div th:replace="~{fragments/pwa-head :: pwaHead}"></div>
 </head>
 
-<body data-theme="dark">
+<body data-theme="dark" th:classappend="${session.impersonating} ? 'impersonating-mode'">
+<div th:if="${session.impersonating}" class="impersonation-banner">
+    <span><i class="fas fa-user-shield" style="margin-right:6px;"></i>Viewing as QA Officer (Super Admin)</span>
+    <a th:href="@{/superadmin/exit-impersonation}"><i class="fas fa-arrow-left" style="margin-right:4px;"></i>Exit</a>
+</div>
 
 <div class="navbar">
     <div>
@@ -419,10 +448,12 @@
         timerProgressBar: true
     });
 
-    if (urlParams.has('reset_success')) {
+        if (urlParams.has('reset_success')) {
         Toast.fire({ icon: 'success', title: 'Inventory Cleaned', text: 'All factory batch balances reset successfully.' });
     } else if (urlParams.has('reset_cancelled')) {
         Toast.fire({ icon: 'info', title: 'Cancelled', text: 'Reset operation was safely aborted.' });
+    } else if (urlParams.has('error') && urlParams.get('error') === 'no_production_access') {
+        Toast.fire({ icon: 'error', title: 'Access Denied', text: 'You do not have permission to access the Production tab.' });
     }
 
     document.querySelectorAll('.count-up').forEach(el => {

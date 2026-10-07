@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+
 
 @Configuration
 public class SecurityConfig {
@@ -37,6 +39,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/api/**"))
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
 
                 .authorizeHttpRequests(auth -> auth
@@ -45,7 +48,8 @@ public class SecurityConfig {
                                 "/manifest.json", "/sw.js",
                                 "/icons/**", "/css/**", "/js/**", "/images/**", "/uploads/**", "/static/**",
                                 "/login-bg.png", "/lumbini_logo.png",
-                                "/api/supplier/*/detail", "/api/production/*/contributions"
+                                "/api/supplier/*/detail", "/api/production/*/contributions",
+                                "/setup/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -69,6 +73,9 @@ public class SecurityConfig {
                                 response.sendRedirect("/mobile/rolling_dashboard");
                             } else if (role.contains("QA") || "admin".equals(username)) {
                                 response.sendRedirect("/qa_dashboard");
+                            } else if ("Superadmin".equals(username)) {
+                                response.sendRedirect("/superadmin");
+                            } else if (role.contains("QA") || "admin".equals(username)) {
                             } else {
                                 response.sendRedirect("/login?error=unknown_type");
                             }

@@ -82,6 +82,11 @@
         }
         .qr-box img { width: 2.6in; height: 2.6in; display: block; }
 
+        /* Print-only QA badge shown above the QR (hidden on screen) */
+        .print-only-badge {
+            display: none;
+        }
+
         /* Trace cards & content */
         .trace-card {
             border: 1px solid var(--card-border);
@@ -147,15 +152,70 @@
         @media print {
             body { background-color: white !important; }
             .detailed-data, .btn, .trace-warning { display:none !important; }
-            .note-frame { border: 2px solid #000 !important; box-shadow: none !important; background: white !important; padding: 12px !important; }
-            .invoice-header { color: black !important; background: white !important; border: 2px solid #000 !important; border-radius: 10px !important; box-shadow: none; padding: 1rem !important; margin-bottom: 1rem !important; }
-            .invoice-header .container { max-width: 620px !important; margin: 0 auto !important; }
-            .invoice-header h1, .invoice-header strong, .invoice-header .text-white-50 { color: black !important; }
-            .company-title { color: black !important; font-weight: 800 !important; }
-            .trace-card { border: none !important; border-bottom: 1px dashed #ccc !important; box-shadow: none; border-radius: 0; margin-bottom: 1rem; padding-bottom: 1rem; }
-            .trace-header { padding: 0; border: none; }
-            .card-body { padding: 0 !important; }
-            .qr-box { border-color: #000 !important; }
+
+            /* Strip the note-frame down to just a container for the QR block */
+            .note-frame {
+                border: none !important;
+                box-shadow: none !important;
+                background: white !important;
+                padding: 0 !important;
+            }
+
+            /* Hide everything in the header except the QR box */
+            .invoice-left,
+            .invoice-meta,
+            .small.text-white-50,
+            .invoice-header h1 {
+                display: none !important;
+            }
+
+            /* Hide the order line items heading and all trace cards */
+            .note-frame > h5,
+            .trace-card {
+                display: none !important;
+            }
+
+            /* Hide the print button itself */
+            .note-frame > .text-center {
+                display: none !important;
+            }
+
+            /* Center the header (now containing only the QR box) on the page */
+            .invoice-header {
+                color: black !important;
+                background: white !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+
+            /* QR box becomes the entire printed page content */
+            .qr-box {
+                border: 2px solid #000 !important;
+                border-radius: 10px !important;
+                padding: 16px !important;
+                background: white !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                gap: 10px !important;
+            }
+
+            .print-only-badge {
+                display: block !important;
+                font-weight: 800;
+                font-size: 1rem;
+                color: #198754;
+            }
+
+            .qr-box img {
+                width: 4in !important;
+                height: 4in !important;
+            }
         }
 
         /* small helpers */
@@ -185,6 +245,9 @@
 
         <div class="text-end">
             <div class="qr-box text-center">
+                <div class="print-only-badge">
+                    <i class="fas fa-check-circle"></i> QA APPROVED
+                </div>
                 <img id="qrCodeImage" th:src="'data:image/png;base64,' + ${qrCode}" alt="QR Code">
                 <div class="mt-1 small fw-bold" style="color: var(--primary-green); font-size: 10px;">SCAN FOR TRACEABILITY</div>
             </div>

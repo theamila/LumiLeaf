@@ -33,6 +33,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import com.lumileaf.qrcode.QRGenerator;
 import org.springframework.beans.factory.annotation.Value;
+import com.lumileaf.lumi.model.Admin;
+import com.lumileaf.lumi.repository.AdminRepository;
+import com.lumileaf.lumi.service.PermissionService;
 
 
 @Controller
@@ -50,6 +53,8 @@ public class ProductionController {
     private String baseUrl;
 
     @Autowired private TemplateEngine templateEngine;
+    @Autowired private AdminRepository adminRepo;
+    @Autowired private PermissionService permissionService;
 
     private double roundToTwoDecimals(double value) {
         return Math.round(value * 100.0) / 100.0;
@@ -72,7 +77,7 @@ public class ProductionController {
     }
 
     private void recalculateStockLotTotals(StockProduction lot, String[] sourceLotNumbers) {
-        double op1=0, opa=0, bop1=0, pekoe=0, bop=0, bopf=0, eb=0, ffsp=0, ffexs=0, dust=0, bm=0, bp=0, refuse=0, total=0;
+        double op1=0, opa=0, bop1=0, pekoe=0, bop=0, bopf=0, eb=0, ffsp=0, ffexs=0, bop1a=0, dust=0, bm=0, bp=0, refuse=0, total=0;
         for (String sourceLot : sourceLotNumbers) {
             List<ProductionBatch> batchesForSource = productionRepo.findAllByLotNumber(sourceLot.trim());
             if (batchesForSource == null || batchesForSource.isEmpty()) continue;
@@ -81,6 +86,7 @@ public class ProductionController {
                 op1 += nz(b.getOp1()); opa += nz(b.getOpa()); bop1 += nz(b.getBop1());
                 pekoe += nz(b.getPekoe()); bop += nz(b.getBop()); bopf += nz(b.getBopf());
                 eb += nz(b.getEb()); ffsp += nz(b.getFfsp()); ffexs += nz(b.getFfexs());
+                bop1a += nz(b.getBop1A());
                 dust += nz(b.getDust()); bm += nz(b.getBm()); bp += nz(b.getBp());
                 refuse += nz(b.getRefusedTea()); total += nz(b.getActualMadeTea());
             }
@@ -89,7 +95,7 @@ public class ProductionController {
         lot.setBop1(roundToTwoDecimals(bop1)); lot.setPekoe(roundToTwoDecimals(pekoe));
         lot.setBop(roundToTwoDecimals(bop)); lot.setBopf(roundToTwoDecimals(bopf));
         lot.setEb(roundToTwoDecimals(eb)); lot.setFfsp(roundToTwoDecimals(ffsp));
-        lot.setFfexs(roundToTwoDecimals(ffexs)); lot.setDust(roundToTwoDecimals(dust));
+        lot.setFfexs(roundToTwoDecimals(ffexs));lot.setBop1A(roundToTwoDecimals(bop1a)); lot.setDust(roundToTwoDecimals(dust));
         lot.setBm(roundToTwoDecimals(bm)); lot.setBp(roundToTwoDecimals(bp));
         lot.setRefusedTea(roundToTwoDecimals(refuse)); lot.setTotal(roundToTwoDecimals(total));
         stockProductionRepo.save(lot);
@@ -121,7 +127,14 @@ public class ProductionController {
             @RequestParam(value = "syncSuccess", required = false) String syncSuccess,
             @RequestParam(value = "deleted", required = false) String deleted,
             @RequestParam(value = "rejected", required = false) String rejected,
-            Model model) {
+            HttpSession session, Model model) {
+
+        String username = (String) session.getAttribute("username");
+        Admin admin = (username != null) ? adminRepo.findByUsername(username) : null;
+        if ("QA".equals(session.getAttribute("role"))
+                && (admin == null || !permissionService.hasPermission(admin, "QA_ACCESS_PRODUCTION_TAB"))) {
+            return "redirect:/qa_dashboard?error=no_production_access";
+        }
 
         // ── FIX (ProductionController #3): Previously filtered out CONSOLIDATED batches,
         // which hid them from /production entirely the moment they were sent to Stock
@@ -362,6 +375,7 @@ public class ProductionController {
                 case "EB":    batch.setEb(value); break;
                 case "FFSP":  batch.setFfsp(value); break;
                 case "FFEXS": batch.setFfexs(value); break;
+                case "BOP1A": batch.setBop1A(value); break;
                 case "DUST":  batch.setDust(value); break;
                 case "BM":    batch.setBm(value); break;
                 case "BP":    batch.setBp(value); break;
@@ -434,7 +448,7 @@ public class ProductionController {
 
             lot.setOp1(0.0); lot.setOpa(0.0); lot.setBop1(0.0); lot.setPekoe(0.0);
             lot.setBop(0.0); lot.setBopf(0.0); lot.setEb(0.0); lot.setFfsp(0.0);
-            lot.setFfexs(0.0); lot.setDust(0.0); lot.setBm(0.0); lot.setBp(0.0);
+            lot.setFfexs(0.0); lot.setBop1A(0.0); lot.setDust(0.0); lot.setBm(0.0); lot.setBp(0.0);
             lot.setRefusedTea(0.0);
 
             for (ProductionBatch b : batches) {
@@ -447,6 +461,7 @@ public class ProductionController {
                 lot.setEb(lot.getEb() + (b.getEb() != null ? b.getEb() : 0));
                 lot.setFfsp(lot.getFfsp() + (b.getFfsp() != null ? b.getFfsp() : 0));
                 lot.setFfexs(lot.getFfexs() + (b.getFfexs() != null ? b.getFfexs() : 0));
+                lot.setBop1A(lot.getBop1A() + (b.getBop1A() != null ? b.getBop1A() : 0));
                 lot.setDust(lot.getDust() + (b.getDust() != null ? b.getDust() : 0));
                 lot.setBm(lot.getBm() + (b.getBm() != null ? b.getBm() : 0));
                 lot.setBp(lot.getBp() + (b.getBp() != null ? b.getBp() : 0));
@@ -487,7 +502,7 @@ public class ProductionController {
                 (b.getBop1()!=null?b.getBop1():0) + (b.getPekoe()!=null?b.getPekoe():0) +
                 (b.getBop()!=null?b.getBop():0) + (b.getBopf()!=null?b.getBopf():0) +
                 (b.getEb()!=null?b.getEb():0) + (b.getFfsp()!=null?b.getFfsp():0) +
-                (b.getFfexs()!=null?b.getFfexs():0) + (b.getDust()!=null?b.getDust():0) +
+                (b.getFfexs()!=null?b.getFfexs():0) + (b.getBop1A()!=null?b.getBop1A():0) + (b.getDust()!=null?b.getDust():0) +
                 (b.getBm()!=null?b.getBm():0) + (b.getBp()!=null?b.getBp():0) +
                 (b.getRefusedTea()!=null?b.getRefusedTea():0);
     }
@@ -502,6 +517,7 @@ public class ProductionController {
         if (source.getEb() != null) target.setEb(source.getEb());
         if (source.getFfsp() != null) target.setFfsp(source.getFfsp());
         if (source.getFfexs() != null) target.setFfexs(source.getFfexs());
+        if (source.getBop1A() != null) target.setBop1A(source.getBop1A());
         if (source.getDust() != null) target.setDust(source.getDust());
         if (source.getBm() != null) target.setBm(source.getBm());
         if (source.getBp() != null) target.setBp(source.getBp());
@@ -847,6 +863,7 @@ public class ProductionController {
                     (lot.getEb() != null ? lot.getEb() : 0) +
                     (lot.getFfsp() != null ? lot.getFfsp() : 0) +
                     (lot.getFfexs() != null ? lot.getFfexs() : 0) +
+                    (lot.getBop1A() != null ? lot.getBop1A() : 0) +
                     (lot.getDust() != null ? lot.getDust() : 0) +
                     (lot.getBm() != null ? lot.getBm() : 0) +
                     (lot.getBp() != null ? lot.getBp() : 0) +
@@ -911,13 +928,14 @@ public class ProductionController {
         double newEb = roundToTwoDecimals(nz(existing.getEb()) + nz(editedStock.getEb()));
         double newFfsp = roundToTwoDecimals(nz(existing.getFfsp()) + nz(editedStock.getFfsp()));
         double newFfexs = roundToTwoDecimals(nz(existing.getFfexs()) + nz(editedStock.getFfexs()));
+        double newBop1A = roundToTwoDecimals(nz(existing.getBop1A()) + nz(editedStock.getBop1A()));
         double newDust = roundToTwoDecimals(nz(existing.getDust()) + nz(editedStock.getDust()));
         double newBm = roundToTwoDecimals(nz(existing.getBm()) + nz(editedStock.getBm()));
         double newBp = roundToTwoDecimals(nz(existing.getBp()) + nz(editedStock.getBp()));
         double newRefused = roundToTwoDecimals(nz(existing.getRefusedTea()) + nz(editedStock.getRefusedTea()));
 
         double newGradeSum = roundToTwoDecimals(newOp1 + newOpa + newBop1 + newPekoe + newBop + newBopf +
-                newEb + newFfsp + newFfexs + newDust + newBm + newBp + newRefused);
+                newEb + newFfsp + newFfexs + newBop1A + newDust + newBm + newBp + newRefused);
 
         if (ceiling > 0 && newGradeSum > ceiling) {
             ra.addFlashAttribute("error", "Sum of tea grades (" + newGradeSum + " kg) cannot exceed this lot's total capacity (" + ceiling + " kg).");
@@ -933,6 +951,7 @@ public class ProductionController {
         existing.setEb(newEb);
         existing.setFfsp(newFfsp);
         existing.setFfexs(newFfexs);
+        existing.setBop1A(newBop1A);
         existing.setDust(newDust);
         existing.setBm(newBm);
         existing.setBp(newBp);

@@ -19,7 +19,7 @@ public class GradeTransaction {
     private String sourceLotNumber;   // NEW
 
     // Resulting Target Grades
-    private Double op1=0.0, opa=0.0, bop1=0.0, pekoe=0.0, bop=0.0, bopf=0.0, eb=0.0, ffsp=0.0, ffexs=0.0, dust=0.0, bm=0.0, bp=0.0, refusedTea=0.0;
+    private Double op1=0.0, opa=0.0, bop1=0.0, pekoe=0.0, bop=0.0, bopf=0.0, eb=0.0, ffsp=0.0, ffexs=0.0, bop1A=0.0, dust=0.0, bm=0.0, bp=0.0, refusedTea=0.0;
 
     // --- GETTERS & SETTERS ---
     public Long getId() { return id; }
@@ -46,6 +46,7 @@ public class GradeTransaction {
     public Double getEb() { return eb; } public void setEb(Double eb) { this.eb = eb; }
     public Double getFfsp() { return ffsp; } public void setFfsp(Double ffsp) { this.ffsp = ffsp; }
     public Double getFfexs() { return ffexs; } public void setFfexs(Double ffexs) { this.ffexs = ffexs; }
+    public Double getBop1A() { return bop1A; } public void setBop1A(Double bop1A) { this.bop1A = bop1A; }
     public Double getDust() { return dust; } public void setDust(Double dust) { this.dust = dust; }
     public Double getBm() { return bm; } public void setBm(Double bm) { this.bm = bm; }
     public Double getBp() { return bp; } public void setBp(Double bp) { this.bp = bp; }

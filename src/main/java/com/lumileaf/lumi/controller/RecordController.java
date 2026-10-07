@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.Arrays;
+import com.lumileaf.lumi.service.PermissionService;
 
 @Controller
 public class RecordController {
@@ -21,6 +22,7 @@ public class RecordController {
     @Autowired private WitheringPointRepository witheringRepo;
     @Autowired private AdminRepository adminRepo;
     @Autowired private ProductionBatchRepository productionRepo;
+    @Autowired private PermissionService permissionService;
     @Autowired private WaitingPointRepository waitingPointRepo;
 
     // --- MATHEMATICAL ROUNDING HELPER ---
@@ -91,7 +93,13 @@ public class RecordController {
                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate selectedDate,
                               HttpSession session) {
 
-        if (session.getAttribute("username") == null) return "redirect:/login";
+        String username = (String) session.getAttribute("username");
+        if (username == null) return "redirect:/login";
+
+        Admin admin = adminRepo.findByUsername(username);
+        if (admin == null || !permissionService.hasPermission(admin, "ROLLING_SAVE")) {
+            return "redirect:/mobile/record_rolling_dashboard?error=no_permission";
+        }
 
         // Use selectedDate from form (the date picker value), fallback to today
         LocalDate activeRollingDate = (selectedDate != null) ? selectedDate : LocalDate.now();

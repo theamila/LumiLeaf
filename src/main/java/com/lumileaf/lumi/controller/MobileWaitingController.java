@@ -27,6 +27,9 @@ import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import com.lumileaf.lumi.model.NotificationEvent;
 import com.lumileaf.lumi.repository.NotificationEventRepository;
+import com.lumileaf.lumi.model.Admin;
+import com.lumileaf.lumi.repository.AdminRepository;
+import com.lumileaf.lumi.service.PermissionService;
 @Controller
 public class MobileWaitingController {
 
@@ -36,6 +39,11 @@ public class MobileWaitingController {
 
     @Autowired
     private WaitingPointRepository waitingRepo;
+    @Autowired
+    private AdminRepository adminRepo;
+
+    @Autowired
+    private PermissionService permissionService;
 
     @Autowired
     private SupplierRepository supplierRepo;
@@ -119,7 +127,15 @@ public class MobileWaitingController {
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "officerSelect", required = false) String officerSelect,
             @RequestParam(value = "customOfficerName", required = false) String customOfficerName,
+            HttpSession session,
             RedirectAttributes redirectAttributes) {
+
+        String username = (String) session.getAttribute("username");
+        Admin admin = (username != null) ? adminRepo.findByUsername(username) : null;
+        if (admin == null || !permissionService.hasPermission(admin, "WEIGHING_UPLOAD_CSV")) {
+            redirectAttributes.addFlashAttribute("errorMessage", "You don't have permission to upload CSV files.");
+            return "redirect:/mobile/waiting_dashboard";
+        }
 
         if (file.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "The uploaded file is empty.");
@@ -233,7 +249,13 @@ public class MobileWaitingController {
 
     @PostMapping("/api/waiting/finalize")
     @Transactional
-    public String finalizeRecords(@RequestParam Map<String, String> allParams, RedirectAttributes redirectAttributes) {
+    public String finalizeRecords(@RequestParam Map<String, String> allParams, HttpSession session, RedirectAttributes redirectAttributes) {
+        String username = (String) session.getAttribute("username");
+        Admin admin = (username != null) ? adminRepo.findByUsername(username) : null;
+        if (admin == null || !permissionService.hasPermission(admin, "WEIGHING_FINALIZE")) {
+            redirectAttributes.addFlashAttribute("errorMessage", "You don't have permission to finalize records.");
+            return "redirect:/mobile/waiting_dashboard";
+        }
         try {
             // ✅ FIX #1: Only fetch PENDING records (not already finalized)
             List<WaitingPoint> pendingRecords = waitingRepo.findByStatusOrderByDateDesc("PENDING");

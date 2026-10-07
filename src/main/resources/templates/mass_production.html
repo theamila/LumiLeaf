@@ -22,6 +22,11 @@
     <div th:replace="~{fragments/pwa-head :: pwaHead}"></div>
 </head>
 <body class="bg-light">
+<div th:if="${error}" class="alert alert-danger alert-dismissible fade show mx-3 mt-3" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <span th:text="${error}">Error Message</span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">

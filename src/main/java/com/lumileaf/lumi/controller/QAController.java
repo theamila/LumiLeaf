@@ -26,6 +26,10 @@ import com.lumileaf.lumi.service.ContributionService;
 import java.time.LocalDateTime;
 // Adjust the package if you saved it elsewhere
 
+import com.lumileaf.lumi.model.Admin;
+import com.lumileaf.lumi.repository.AdminRepository;
+import com.lumileaf.lumi.service.PermissionService;
+
 @Controller
 public class QAController {
 
@@ -43,9 +47,11 @@ public class QAController {
     @Autowired private StockProductionRepository stockProductionRepo;
     @Autowired private ContributionService contributionService;
     @Autowired private SupplierRepository supplierRepo;
+    @Autowired private AdminRepository adminRepo;
+    @Autowired private PermissionService permissionService;
     // Standardized global grade array for cross-endpoint key consistency
     private static final String[] ALL_GRADES = {
-            "OP1", "OPA", "BOP1", "PEKOE", "BOP", "BOPF", "EB", "FFSP", "FFEXS", "DUST", "BM", "BP", "REFUSE"
+            "OP1", "OPA", "BOP1", "PEKOE", "BOP", "BOPF", "EB", "FFSP", "FFEXS", "BOP1A", "DUST", "BM", "BP", "REFUSE"
     };
     // --------------------------------------------------
     // 1. QA DASHBOARD (UPDATED TO SHOW ALL GRADES)
@@ -254,6 +260,7 @@ public class QAController {
             case "EB" -> batch.getEb();
             case "FFSP" -> batch.getFfsp();
             case "FFEXS" -> batch.getFfexs();
+            case "BOP1A" -> batch.getBop1A();
             case "DUST" -> batch.getDust();
             case "BM" -> batch.getBm();
             case "BP" -> batch.getBp();
@@ -274,6 +281,7 @@ public class QAController {
             case "EB" -> balance.getEb();
             case "FFSP" -> balance.getFfsp();
             case "FFEXS" -> balance.getFfexs();
+            case "BOP1A" -> balance.getBop1A();
             case "DUST" -> balance.getDust();
             case "BM" -> balance.getBm();
             case "BP" -> balance.getBp();
@@ -294,6 +302,7 @@ public class QAController {
             case "EB"     -> tx.getEb();
             case "FFSP"   -> tx.getFfsp();
             case "FFEXS"  -> tx.getFfexs();
+            case "BOP1A"  -> tx.getBop1A();
             case "DUST"   -> tx.getDust();
             case "BM"     -> tx.getBm();
             case "BP"     -> tx.getBp();
@@ -314,6 +323,7 @@ public class QAController {
             case "EB"     -> sp.getEb();
             case "FFSP"   -> sp.getFfsp();
             case "FFEXS"  -> sp.getFfexs();
+            case "BOP1A"  -> sp.getBop1A();
             case "DUST"   -> sp.getDust();
             case "BM"     -> sp.getBm();
             case "BP"     -> sp.getBp();
@@ -567,8 +577,13 @@ public class QAController {
 
 
     @GetMapping("/waiting/delete/{id}")
-    public String deleteWaitingRecord(@PathVariable Long id, HttpSession session) {
+    public String deleteWaitingRecord(@PathVariable Long id, HttpSession session, RedirectAttributes ra) {
         if (!"QA".equals(session.getAttribute("role"))) return "redirect:/login";
+        Admin admin = adminRepo.findByUsername(session.getAttribute("username").toString());
+        if (admin == null || !permissionService.hasPermission(admin, "QA_DELETE_WEIGHING_RECORD")) {
+            ra.addFlashAttribute("error", "You don't have permission to delete weighing records.");
+            return "redirect:/waiting";
+        }
         waitingRepo.deleteById(id);
         return "redirect:/waiting?deleted=true";
     }
@@ -586,6 +601,11 @@ public class QAController {
                                       HttpSession session,
                                       RedirectAttributes ra) {
         if (!"QA".equals(session.getAttribute("role"))) return "redirect:/login";
+        Admin admin = adminRepo.findByUsername(session.getAttribute("username").toString());
+        if (admin == null || !permissionService.hasPermission(admin, "QA_EDIT_WEIGHING_RECORD")) {
+            ra.addFlashAttribute("error", "You don't have permission to edit weighing records.");
+            return "redirect:/waiting";
+        }
 
         WaitingPoint existing = waitingRepo.findById(submitted.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Waiting record not found: " + submitted.getId()));
@@ -635,6 +655,11 @@ public class QAController {
                                  HttpSession session,
                                  RedirectAttributes ra) {
         if (!"QA".equals(session.getAttribute("role"))) return "redirect:/login";
+        Admin admin = adminRepo.findByUsername(session.getAttribute("username").toString());
+        if (admin == null || !permissionService.hasPermission(admin, "QA_BACKFILL_WEIGHING_RECORD")) {
+            ra.addFlashAttribute("error", "You don't have permission to add missed records to a batch.");
+            return "redirect:/waiting";
+        }
 
         if (batchId == null || batchId.isBlank()) {
             ra.addFlashAttribute("error", "Please select an existing batch.");
@@ -889,7 +914,14 @@ public class QAController {
 
     // ✅ FIX #2: New endpoint to update estimated amount
     @PostMapping("/update-estimated-amount")
-    public String updateEstimatedAmount(@RequestParam String date, @RequestParam Double estimatedAmount){
+    public String updateEstimatedAmount(@RequestParam String date, @RequestParam Double estimatedAmount,
+                                        HttpSession session, RedirectAttributes ra){
+        String username = (String) session.getAttribute("username");
+        Admin admin = (username != null) ? adminRepo.findByUsername(username) : null;
+        if (admin == null || !permissionService.hasPermission(admin, "QA_MASS_PRODUCTION_SET")) {
+            ra.addFlashAttribute("error", "You don't have permission to update mass production figures.");
+            return "redirect:/mass-production";
+        }
         LocalDate d = LocalDate.parse(date);
         MassProduction r = massProductionRepo.findByDate(d).orElse(new MassProduction());
         r.setDate(d);
@@ -899,7 +931,14 @@ public class QAController {
     }
 
     @PostMapping("/update-actual-tea")
-    public String updateActualTea(@RequestParam String date, @RequestParam Double actual){
+    public String updateActualTea(@RequestParam String date, @RequestParam Double actual,
+                                  HttpSession session, RedirectAttributes ra){
+        String username = (String) session.getAttribute("username");
+        Admin admin = (username != null) ? adminRepo.findByUsername(username) : null;
+        if (admin == null || !permissionService.hasPermission(admin, "QA_MASS_PRODUCTION_SET")) {
+            ra.addFlashAttribute("error", "You don't have permission to update mass production figures.");
+            return "redirect:/mass-production";
+        }
         LocalDate d = LocalDate.parse(date);
         MassProduction r = massProductionRepo.findByDate(d).orElse(new MassProduction());
         r.setDate(d);
@@ -975,7 +1014,13 @@ public class QAController {
     }
 
     @PostMapping("/qa/save-blend-balance")
-    public String saveManualBlend(@RequestParam Map<String, String> params, RedirectAttributes redirectAttributes){
+    public String saveManualBlend(@RequestParam Map<String, String> params, HttpSession session, RedirectAttributes redirectAttributes){
+        String username = (String) session.getAttribute("username");
+        Admin admin = (username != null) ? adminRepo.findByUsername(username) : null;
+        if (admin == null || !permissionService.hasPermission(admin, "QA_BLEND_BALANCE")) {
+            redirectAttributes.addFlashAttribute("error", "You don't have permission to add blend balance entries.");
+            return "redirect:/qa/blend-balance";
+        }
         String blendId = params.get("blendId");
         if(blendId == null || blendId.trim().isEmpty()){
             redirectAttributes.addFlashAttribute("error", "Blend ID is required.");
@@ -993,6 +1038,7 @@ public class QAController {
         e.setEb(safeParse(params.get("eb")));
         e.setFfsp(safeParse(params.get("ffsp")));
         e.setFfexs(safeParse(params.get("ffexs")));
+        e.setBop1A(safeParse(params.get("bop1a")));
         e.setDust(safeParse(params.get("dust")));
         e.setBm(safeParse(params.get("bm")));
         e.setBp(safeParse(params.get("bp")));
@@ -1026,6 +1072,11 @@ public class QAController {
     @PostMapping("/qa/save-transaction")
     public String saveTransaction(@RequestParam Map<String, String> params, HttpSession session, RedirectAttributes ra) {
         if (!"QA".equals(session.getAttribute("role"))) return "redirect:/login";
+        Admin admin = adminRepo.findByUsername(session.getAttribute("username").toString());
+        if (admin == null || !permissionService.hasPermission(admin, "QA_GRADE_TRANSACTION")) {
+            ra.addFlashAttribute("error", "You don't have permission to make grade transactions.");
+            return "redirect:/transactions";
+        }
         String sourceGrade = params.get("sourceGrade");
         double sourceQty = safeParse(params.get("sourceQty"));
 
@@ -1066,6 +1117,7 @@ public class QAController {
         tx.setEb(safeParse(params.get("eb")));
         tx.setFfsp(safeParse(params.get("ffsp")));
         tx.setFfexs(safeParse(params.get("ffexs")));
+        tx.setBop1A(safeParse(params.get("bop1a")));
         tx.setDust(safeParse(params.get("dust")));
         tx.setBm(safeParse(params.get("bm")));
         tx.setBp(safeParse(params.get("bp")));
@@ -1116,6 +1168,7 @@ public class QAController {
             case "EB"     -> balance.getEb();
             case "FFSP"   -> balance.getFfsp();
             case "FFEXS"  -> balance.getFfexs();
+            case "BOP1A"  -> balance.getBop1A();
             case "DUST"   -> balance.getDust();
             case "BM"     -> balance.getBm();
             case "BP"     -> balance.getBp();
@@ -1137,6 +1190,7 @@ public class QAController {
             case "EB"     -> sp.getEb();
             case "FFSP"   -> sp.getFfsp();
             case "FFEXS"  -> sp.getFfexs();
+            case "BOP1A"  -> sp.getBop1();
             case "DUST"   -> sp.getDust();
             case "BM"     -> sp.getBm();
             case "BP"     -> sp.getBp();
